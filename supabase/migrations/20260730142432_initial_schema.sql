@@ -1,31 +1,35 @@
 -- ============================================
--- BALANCE APP - INITIAL DATABASE SCHEMA
+-- BALANCE APP
+-- INITIAL DATABASE SCHEMA v1.0
 -- ============================================
 
--- Necesario para generar UUIDs
+-- UUID generation
 create extension if not exists "pgcrypto";
 
 
 -- ============================================
 -- PROFILES
--- Información pública de los usuarios
+-- Public user information
 -- ============================================
 
 create table public.profiles (
-    id uuid primary key references auth.users(id) on delete cascade,
 
-    full_name text not null,
+    id uuid primary key
+        references auth.users(id)
+        on delete cascade,
+
+    full_name text,
 
     avatar_url text,
 
     created_at timestamptz not null default now(),
+
     updated_at timestamptz not null default now()
+
 );
 
 
--- ============================================
--- CREAR PERFIL AUTOMÁTICAMENTE AL REGISTRARSE
--- ============================================
+-- Automatically create profile after signup
 
 create or replace function public.handle_new_user()
 returns trigger
@@ -33,30 +37,22 @@ language plpgsql
 security definer
 set search_path = public
 as $$
+
 begin
 
     insert into public.profiles (
         id,
-        full_name,
-        avatar_url
+        full_name
     )
-
     values (
         new.id,
-
-        coalesce(
-            new.raw_user_meta_data->>'full_name',
-            new.raw_user_meta_data->>'name',
-            'Usuario'
-        ),
-
-        new.raw_user_meta_data->>'avatar_url'
+        new.raw_user_meta_data ->> 'full_name'
     );
-
 
     return new;
 
 end;
+
 $$;
 
 
@@ -66,116 +62,136 @@ after insert on auth.users
 
 for each row
 
-execute function public.handle_new_user();
-
+execute procedure public.handle_new_user();
 
 
 
 -- ============================================
 -- HOMES
--- Espacio compartido de gastos
+-- Shared financial spaces
 -- ============================================
 
 create table public.homes (
 
     id uuid primary key default gen_random_uuid(),
 
-    name text not null,
+    name text not null default 'Mi hogar',
 
-    created_by uuid not null references public.profiles(id),
+    created_by uuid not null
+        references public.profiles(id)
+        on delete cascade,
 
     created_at timestamptz not null default now(),
+
     updated_at timestamptz not null default now()
 
 );
 
+
+
 -- ============================================
 -- HOME MEMBERS
--- Usuarios que pertenecen a una casa
+-- Users inside homes
 -- ============================================
 
 create table public.home_members (
 
     id uuid primary key default gen_random_uuid(),
 
-    home_id uuid not null references public.homes(id) on delete cascade,
+    home_id uuid not null
+        references public.homes(id)
+        on delete cascade,
 
-    profile_id uuid not null references public.profiles(id) on delete cascade,
+
+    profile_id uuid not null
+        references public.profiles(id)
+        on delete cascade,
 
 
     role text not null default 'member'
-        check (role in ('owner', 'member')),
+
+        check (
+            role in (
+                'owner',
+                'member'
+            )
+        ),
 
 
     created_at timestamptz not null default now(),
 
+    updated_at timestamptz not null default now(),
+
 
     unique(home_id, profile_id)
 
-);  
+);
 
 -- ============================================
 -- CATEGORIES
--- Categorías de gastos
+-- Expense classification
 -- ============================================
 
 create table public.categories (
 
     id uuid primary key default gen_random_uuid(),
 
-    home_id uuid not null references public.homes(id) on delete cascade,
+    home_id uuid not null
+        references public.homes(id)
+        on delete cascade,
+
 
     name text not null,
 
+
     icon text,
 
+
     color text,
+
 
     created_at timestamptz not null default now(),
 
     updated_at timestamptz not null default now(),
 
+
     unique(home_id, name)
 
 );
 
+
+
 -- ============================================
 -- SERVICES
--- Servicios recurrentes del hogar
+-- Recurring household services
 -- ============================================
 
 create table public.services (
 
     id uuid primary key default gen_random_uuid(),
 
-    home_id uuid not null references public.homes(id) on delete cascade,
 
-    category_id uuid references public.categories(id) on delete set null,
+    home_id uuid not null
+        references public.homes(id)
+        on delete cascade,
 
 
     name text not null,
 
-    provider text,
+
+    amount numeric(12,2)
+        check (amount >= 0),
 
 
-    billing_day int
-        check (billing_day between 1 and 31),
+    due_day integer
+        check (
+            due_day between 1 and 31
+        ),
 
 
-    split_type text not null default 'equal'
-        check (split_type in (
-            'equal',
-            'percentage',
-            'custom'
-        )),
-
-
-    payer_policy text not null default 'any'
-        check (payer_policy in (
-            'any',
-            'owner_only',
-            'specific'
-        )),
+    assigned_to uuid
+        references public.profiles(id)
+        on delete set null,
 
 
     active boolean not null default true,
@@ -187,9 +203,11 @@ create table public.services (
 
 );
 
+
+
 -- ============================================
 -- EXPENSES
--- Gastos reales registrados
+-- Main expense records
 -- ============================================
 
 create table public.expenses (
@@ -202,8 +220,9 @@ create table public.expenses (
         on delete cascade,
 
 
-    created_by uuid not null
-        references public.profiles(id),
+    category_id uuid
+        references public.categories(id)
+        on delete set null,
 
 
     service_id uuid
@@ -211,38 +230,50 @@ create table public.expenses (
         on delete set null,
 
 
-    category_id uuid
-        references public.categories(id)
-        on delete set null,
-
-
     description text not null,
 
 
     amount numeric(12,2) not null
-        check (amount > 0),
+
+        check (
+            amount >= 0
+        ),
 
 
-    payment_method text not null
-        check (payment_method in (
-            'cash',
-            'debit',
-            'credit',
-            'transfer',
-            'mercadopago',
-            'other'
-        )),
+    expense_date date not null default current_date,
+
+
+    paid_by uuid not null
+        references public.profiles(id)
+        on delete cascade,
+
+
+    payment_method text not null default 'other'
+
+        check (
+            payment_method in (
+                'cash',
+                'debit',
+                'credit',
+                'transfer',
+                'mercadopago',
+                'other'
+            )
+        ),
 
 
     status text not null default 'pending'
-        check (status in (
-            'pending',
-            'approved',
-            'rejected'
-        )),
+
+        check (
+            status in (
+                'pending',
+                'approved',
+                'rejected'
+            )
+        ),
 
 
-    purchase_date date not null default current_date,
+    notes text,
 
 
     created_at timestamptz not null default now(),
@@ -251,9 +282,54 @@ create table public.expenses (
 
 );
 
+
+
+-- ============================================
+-- EXPENSE SHARES
+-- Distribution of expense responsibility
+-- ============================================
+
+create table public.expense_shares (
+
+    id uuid primary key default gen_random_uuid(),
+
+
+    expense_id uuid not null
+        references public.expenses(id)
+        on delete cascade,
+
+
+    profile_id uuid not null
+        references public.profiles(id)
+        on delete cascade,
+
+
+    expected_amount numeric(12,2) not null default 0
+
+        check (
+            expected_amount >= 0
+        ),
+
+
+    actual_amount numeric(12,2) not null default 0
+
+        check (
+            actual_amount >= 0
+        ),
+
+
+    created_at timestamptz not null default now(),
+
+    updated_at timestamptz not null default now(),
+
+
+    unique(expense_id, profile_id)
+
+);
+
 -- ============================================
 -- TRANSFERS
--- Transferencias para ajustar saldos
+-- Money movements between members
 -- ============================================
 
 create table public.transfers (
@@ -277,13 +353,16 @@ create table public.transfers (
 
 
     amount numeric(12,2) not null
-        check (amount > 0),
 
-
-    description text,
+        check (
+            amount > 0
+        ),
 
 
     transfer_date date not null default current_date,
+
+
+    description text,
 
 
     created_at timestamptz not null default now(),
@@ -292,9 +371,11 @@ create table public.transfers (
 
 );
 
+
+
 -- ============================================
 -- APPROVALS
--- Aprobación de gastos por miembros
+-- Expense confirmation workflow
 -- ============================================
 
 create table public.approvals (
@@ -313,17 +394,17 @@ create table public.approvals (
 
 
     status text not null default 'pending'
-        check (status in (
-            'pending',
-            'approved',
-            'rejected'
-        )),
+
+        check (
+            status in (
+                'pending',
+                'approved',
+                'rejected'
+            )
+        ),
 
 
     comment text,
-
-
-    approved_at timestamptz,
 
 
     created_at timestamptz not null default now(),
@@ -335,9 +416,11 @@ create table public.approvals (
 
 );
 
+
+
 -- ============================================
 -- ATTACHMENTS
--- Archivos asociados a gastos
+-- Receipts and expense images
 -- ============================================
 
 create table public.attachments (
@@ -362,9 +445,11 @@ create table public.attachments (
 
 );
 
+
+
 -- ============================================
 -- ACTIVITY LOGS
--- Historial de acciones del sistema
+-- History of important actions
 -- ============================================
 
 create table public.activity_logs (
@@ -397,3 +482,253 @@ create table public.activity_logs (
     created_at timestamptz not null default now()
 
 );
+
+-- ============================================
+-- INDEXES
+-- Performance optimization
+-- ============================================
+
+
+-- HOME MEMBERS
+
+create index idx_home_members_home_id
+on public.home_members(home_id);
+
+
+create index idx_home_members_profile_id
+on public.home_members(profile_id);
+
+
+
+-- CATEGORIES
+
+create index idx_categories_home_id
+on public.categories(home_id);
+
+
+
+-- SERVICES
+
+create index idx_services_home_id
+on public.services(home_id);
+
+
+create index idx_services_active
+on public.services(active);
+
+
+
+-- EXPENSES
+
+create index idx_expenses_home_id
+on public.expenses(home_id);
+
+
+create index idx_expenses_date
+on public.expenses(expense_date);
+
+
+create index idx_expenses_home_date
+on public.expenses(home_id, expense_date);
+
+
+create index idx_expenses_paid_by
+on public.expenses(paid_by);
+
+
+create index idx_expenses_category
+on public.expenses(category_id);
+
+
+
+-- EXPENSE SHARES
+
+create index idx_expense_shares_expense_id
+on public.expense_shares(expense_id);
+
+
+create index idx_expense_shares_profile_id
+on public.expense_shares(profile_id);
+
+
+
+-- TRANSFERS
+
+create index idx_transfers_home_id
+on public.transfers(home_id);
+
+
+create index idx_transfers_date
+on public.transfers(transfer_date);
+
+
+
+-- APPROVALS
+
+create index idx_approvals_expense_id
+on public.approvals(expense_id);
+
+
+create index idx_approvals_profile_id
+on public.approvals(profile_id);
+
+
+create index idx_approvals_status
+on public.approvals(status);
+
+
+
+-- ATTACHMENTS
+
+create index idx_attachments_expense_id
+on public.attachments(expense_id);
+
+
+
+-- ACTIVITY LOGS
+
+create index idx_activity_logs_home_id
+on public.activity_logs(home_id);
+
+
+create index idx_activity_logs_created_at
+on public.activity_logs(created_at);
+
+
+
+
+-- ============================================
+-- UPDATED_AT FUNCTION
+-- Automatically updates timestamps
+-- ============================================
+
+
+create or replace function public.update_updated_at_column()
+
+returns trigger
+
+language plpgsql
+
+as $$
+
+begin
+
+    new.updated_at = now();
+
+    return new;
+
+end;
+
+$$;
+
+
+
+
+-- ============================================
+-- UPDATED_AT TRIGGERS
+-- ============================================
+
+
+create trigger update_profiles_updated_at
+
+before update on public.profiles
+
+for each row
+
+execute procedure public.update_updated_at_column();
+
+
+
+create trigger update_homes_updated_at
+
+before update on public.homes
+
+for each row
+
+execute procedure public.update_updated_at_column();
+
+
+
+create trigger update_home_members_updated_at
+
+before update on public.home_members
+
+for each row
+
+execute procedure public.update_updated_at_column();
+
+
+
+create trigger update_categories_updated_at
+
+before update on public.categories
+
+for each row
+
+execute procedure public.update_updated_at_column();
+
+
+
+create trigger update_services_updated_at
+
+before update on public.services
+
+for each row
+
+execute procedure public.update_updated_at_column();
+
+
+
+create trigger update_expenses_updated_at
+
+before update on public.expenses
+
+for each row
+
+execute procedure public.update_updated_at_column();
+
+
+
+create trigger update_expense_shares_updated_at
+
+before update on public.expense_shares
+
+for each row
+
+execute procedure public.update_updated_at_column();
+
+
+
+create trigger update_transfers_updated_at
+
+before update on public.transfers
+
+for each row
+
+execute procedure public.update_updated_at_column();
+
+
+
+create trigger update_approvals_updated_at
+
+before update on public.approvals
+
+for each row
+
+execute procedure public.update_updated_at_column();
+
+
+
+create trigger update_attachments_updated_at
+
+before update on public.attachments
+
+for each row
+
+execute procedure public.update_updated_at_column();
+
+
+
+-- ============================================
+-- END OF INITIAL SCHEMA v1.0
+-- ============================================
