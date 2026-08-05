@@ -7,7 +7,8 @@ import { supabase } from "@/lib/supabaseClient";
 type AuthState = {
   user: User | null;
   loading: boolean;
-  signInWithEmail: (email: string) => Promise<void>;
+  error: string | null;
+  signInWithEmail: (email: string) => Promise<boolean>;
   signOut: () => Promise<void>;
 };
 
@@ -15,16 +16,21 @@ type AuthState = {
 export function useAuth(): AuthState {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     let active = true;
 
     async function loadSession() {
+      setError(null);
+
       const { data, error } = await supabase.auth.getSession();
 
-      if (error) console.error(error.message);
-
       if (active) {
+        if (error) {
+          setError(error.message);
+        }
+
         setUser(data.session?.user ?? null);
         setLoading(false);
       }
@@ -46,27 +52,39 @@ export function useAuth(): AuthState {
   }, []);
 
   // Login por email (sin Google, sin OAuth)
-  async function signInWithEmail(email: string) {
+  async function signInWithEmail(email: string): Promise<boolean> {
+    setError(null);
+  
     const { error } = await supabase.auth.signInWithOtp({
       email,
+      options: {
+        emailRedirectTo: "http://localhost:3000",
+      },
     });
-
+  
     if (error) {
-      console.error(error.message);
+      setError(error.message);
+      return false;
     }
+  
+    return true;
   }
+  
 
   async function signOut() {
+    setError(null);
+
     const { error } = await supabase.auth.signOut();
 
     if (error) {
-      console.error(error.message);
+      setError(error.message);
     }
   }
 
   return {
     user,
     loading,
+    error,
     signInWithEmail,
     signOut,
   };
