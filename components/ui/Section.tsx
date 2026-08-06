@@ -11,7 +11,7 @@ export function Section({ title, action, children }: SectionProps) {
   return (
     <section className="space-y-3">
       <div className="flex items-center justify-between gap-3">
-        <h2 className="text-base font-bold text-finance-ink">{title}</h2>
+        <h2 className="text-base font-bold text-foreground">{title}</h2>
         {action}
       </div>
       {children}

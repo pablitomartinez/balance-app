@@ -41,7 +41,7 @@ export default function CreateHomePage() {
   if (homeLoading || hasHome) {
     return (
       <main className="flex min-h-screen items-center justify-center">
-        <p className="text-finance-muted">Cargando...</p>
+        <p className="text-muted-foreground">Cargando...</p>
       </main>
     );
   }
@@ -50,22 +50,22 @@ export default function CreateHomePage() {
     <main className="flex min-h-screen items-center px-4 py-8">
       <section className="mx-auto w-full max-w-sm">
         <div className="mb-8">
-          <p className="text-sm font-bold uppercase tracking-wide text-terracotta-700">
+          <p className="text-sm font-bold uppercase tracking-wide text-primary">
             Balance Hogar
           </p>
 
-          <h1 className="mt-3 text-4xl font-black leading-tight text-finance-ink">
+          <h1 className="mt-3 text-4xl font-black leading-tight text-foreground">
             Creá tu hogar.
           </h1>
 
-          <p className="mt-4 text-base leading-7 text-finance-muted">
+          <p className="mt-4 text-base leading-7 text-muted-foreground">
             Elegí un nombre para empezar a organizar los gastos compartidos.
           </p>
         </div>
 
         <form onSubmit={handleSubmit}>
           <label
-            className="mb-2 block text-sm font-semibold text-finance-ink"
+            className="mb-2 block text-sm font-semibold text-foreground"
             htmlFor="home-name"
           >
             Nombre del hogar
@@ -73,7 +73,7 @@ export default function CreateHomePage() {
 
           <input
             id="home-name"
-            className="mb-3 w-full rounded border border-finance-line p-3 text-finance-ink outline-none transition focus:border-terracotta-500 focus:ring-2 focus:ring-terracotta-200"
+            className="mb-3 w-full rounded border border-input p-3 text-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-ring"
             placeholder="Ej. Casa de Ana y Juan"
             value={name}
             onChange={(event) => {
@@ -87,7 +87,7 @@ export default function CreateHomePage() {
           {error && (
             <p
               id="home-name-error"
-              className="mb-3 rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700"
+              className="mb-3 rounded-md border border-destructive-border bg-destructive-muted p-3 text-sm text-destructive"
               role="alert"
             >
               {error}

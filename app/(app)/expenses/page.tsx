@@ -6,8 +6,8 @@ export default function ExpensesPage() {
   return (
     <div className="mx-auto max-w-xl space-y-6">
       <div>
-        <h1 className="text-2xl font-black text-finance-ink">Nuevo gasto</h1>
-        <p className="mt-2 text-sm leading-6 text-finance-muted">
+        <h1 className="text-2xl font-black text-foreground">Nuevo gasto</h1>
+        <p className="mt-2 text-sm leading-6 text-muted-foreground">
           Cada gasto compartido genera una aprobación de la otra persona.
         </p>
       </div>

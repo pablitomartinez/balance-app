@@ -19,7 +19,7 @@ export default function DashboardPage() {
   if (loading) {
     return (
       <main className="flex min-h-screen items-center justify-center">
-        <p className="text-finance-muted">Cargando...</p>
+        <p className="text-muted-foreground">Cargando...</p>
       </main>
     );
   }
@@ -28,7 +28,7 @@ export default function DashboardPage() {
     <div className="space-y-6">
       {home && (
         <Section title="Mi hogar">
-          <p className="text-2xl font-bold text-finance-ink">
+          <p className="text-2xl font-bold text-foreground">
             🏠 {home.name}
           </p>
         </Section>

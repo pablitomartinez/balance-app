@@ -47,15 +47,15 @@ export default function LoginPage() {
     <main className="flex min-h-screen items-center px-4 py-8">
       <section className="mx-auto w-full max-w-sm">
         <div className="mb-8">
-          <p className="text-sm font-bold uppercase tracking-wide text-terracotta-700">
+          <p className="text-sm font-bold uppercase tracking-wide text-primary">
             Balance Hogar
           </p>
 
-          <h1 className="mt-3 text-4xl font-black leading-tight text-finance-ink">
+          <h1 className="mt-3 text-4xl font-black leading-tight text-foreground">
             Gastos claros entre dos personas.
           </h1>
 
-          <p className="mt-4 text-base leading-7 text-finance-muted">
+          <p className="mt-4 text-base leading-7 text-muted-foreground">
             Ingresá con tu email para continuar.
           </p>
         </div>
@@ -68,13 +68,13 @@ export default function LoginPage() {
         />
 
         {error && (
-          <p className="mb-3 rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+          <p className="mb-3 rounded-md border border-destructive-border bg-destructive-muted p-3 text-sm text-destructive">
             {error}
           </p>
         )}
 
         {emailSent && !error && (
-          <p className="mb-3 rounded-md border border-green-200 bg-green-50 p-3 text-sm text-green-700">
+          <p className="mb-3 rounded-md border border-success-border bg-success-muted p-3 text-sm text-success">
             Revisá tu correo. Te enviamos un enlace para iniciar sesión.
           </p>
         )}

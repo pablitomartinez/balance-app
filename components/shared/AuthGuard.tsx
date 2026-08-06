@@ -22,7 +22,7 @@ export function AuthGuard({ children }: AuthGuardProps) {
   if (loading || !user) {
     return (
       <main className="flex min-h-screen items-center justify-center px-4">
-        <div className="h-10 w-10 rounded-full border-4 border-terracotta-200 border-t-terracotta-600" />
+        <div className="h-10 w-10 rounded-full border-4 border-muted border-t-primary" />
       </main>
     );
   }

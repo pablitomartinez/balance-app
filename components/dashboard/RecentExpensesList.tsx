@@ -18,14 +18,14 @@ export function RecentExpensesList({ expenses }: RecentExpensesListProps) {
   }
 
   return (
-    <div className="divide-y divide-finance-line rounded-md border border-finance-line bg-white">
+    <div className="divide-y divide-border rounded-md border border-border bg-card">
       {expenses.map((expense) => (
         <article className="flex items-center justify-between gap-4 p-4" key={expense.id}>
           <div>
-            <p className="font-semibold text-finance-ink">{expense.description}</p>
-            <p className="mt-1 text-xs text-finance-muted">Pagó {expense.paidByName}</p>
+            <p className="font-semibold text-foreground">{expense.description}</p>
+            <p className="mt-1 text-xs text-muted-foreground">Pagó {expense.paidByName}</p>
           </div>
-          <p className="text-sm font-bold text-finance-ink">{formatCurrency(expense.amount)}</p>
+          <p className="text-sm font-bold text-foreground">{formatCurrency(expense.amount)}</p>
         </article>
       ))}
     </div>

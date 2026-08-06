@@ -34,34 +34,20 @@ const config: Config = {
         border: "var(--border)",
         input: "var(--input)",
         ring: "var(--ring)",
-      
+
+        success: "var(--success)",
+        "success-muted": "var(--success-muted)",
+        "success-border": "var(--success-border)",
+
+        warning: "var(--warning)",
+
         destructive: "var(--destructive)",
         "destructive-foreground": "var(--destructive-foreground)",
-      
-        terracotta: {
-          50: "#fff7f3",
-          100: "#ffe8df",
-          200: "#f7cdbf",
-          300: "#eba991",
-          400: "#dc7f60",
-          500: "#c96545",
-          600: "#a94f36",
-          700: "#843e2f",
-          800: "#653329",
-          900: "#3f241f"
-        },
-        
-        finance: {
-          ink: "#1f2421",
-          muted: "#6f736f",
-          surface: "#fffaf6",
-          line: "#ead8cf",
-          success: "#127a54",
-          warning: "#a35b00"
-        }
+        "destructive-muted": "var(--destructive-muted)",
+        "destructive-border": "var(--destructive-border)"
       },
       boxShadow: {
-        soft: "0 16px 40px rgba(63, 36, 31, 0.08)"
+        soft: "var(--shadow-soft)"
       }
     }
   },

@@ -62,8 +62,16 @@
    * (Provisorio para el MVP)
    * ------------------------------------------------------------------ */
 
-  --destructive: #dc2626;
+  --success: #15803d;
+  --success-muted: #f0fdf4;
+  --success-border: #bbf7d0;
+
+  --warning: #a35b00;
+
+  --destructive: #b91c1c;
   --destructive-foreground: #ffffff;
+  --destructive-muted: #fef2f2;
+  --destructive-border: #fecaca;
 
   /* ------------------------------------------------------------------
    * Future tokens

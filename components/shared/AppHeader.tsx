@@ -15,13 +15,13 @@ export function AppHeader() {
   }
 
   return (
-    <header className="sticky top-0 z-10 border-b border-finance-line bg-finance-surface/95 backdrop-blur">
+    <header className="sticky top-0 z-10 border-b border-border bg-background backdrop-blur">
       <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-4 py-3">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-wide text-terracotta-700">
+          <p className="text-xs font-semibold uppercase tracking-wide text-primary">
             Balance Hogar
           </p>
-          <h1 className="text-lg font-bold text-finance-ink">Tu balance compartido</h1>
+          <h1 className="text-lg font-bold text-foreground">Tu balance compartido</h1>
         </div>
         <Button variant="ghost" className="px-3" onClick={handleSignOut}>
           Salir

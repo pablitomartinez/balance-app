@@ -11,11 +11,11 @@ export function Button({ children, className, variant = "primary", ...props }: B
   return (
     <button
       className={cn(
-        "inline-flex min-h-11 items-center justify-center rounded-md px-4 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-terracotta-400 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60",
-        variant === "primary" && "bg-terracotta-600 text-white hover:bg-terracotta-700",
+        "inline-flex min-h-11 items-center justify-center rounded-md px-4 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background disabled:cursor-not-allowed disabled:opacity-60",
+        variant === "primary" && "bg-primary text-primary-foreground hover:bg-primary",
         variant === "secondary" &&
-          "border border-finance-line bg-white text-finance-ink hover:bg-terracotta-50",
-        variant === "ghost" && "text-finance-muted hover:bg-terracotta-50 hover:text-finance-ink",
+          "border border-border bg-card text-foreground hover:bg-muted",
+        variant === "ghost" && "text-muted-foreground hover:bg-muted hover:text-foreground",
         className
       )}
       {...props}
