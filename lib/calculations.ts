@@ -6,6 +6,49 @@ export type BalanceMovement = {
   amount: number;
 };
 
+export type ExpenseShareForBalance = {
+  profileId: string;
+  expectedAmount: number;
+  actualAmount: number;
+};
+
+export function calculateBalanceFromShares(
+  shares: ExpenseShareForBalance[],
+  currentUserId: string
+): BalanceSummary {
+  const currentUserBalance = shares.reduce((total, share) => {
+    if (share.profileId !== currentUserId) {
+      return total;
+    }
+
+    return total + (share.actualAmount - share.expectedAmount);
+  }, 0);
+
+  const epsilon = 0.01;
+
+  if (Math.abs(currentUserBalance) < epsilon) {
+    return {
+      amount: 0,
+      direction: "even",
+      label: "Están a mano",
+    };
+  }
+
+  if (currentUserBalance > 0) {
+    return {
+      amount: Math.abs(currentUserBalance),
+      direction: "second_owes_first",
+      label: "La otra persona te debe",
+    };
+  }
+
+  return {
+    amount: Math.abs(currentUserBalance),
+    direction: "first_owes_second",
+    label: "Vos debés",
+  };
+}
+
 // Este archivo centraliza los cálculos financieros.
 // La deuda nunca se guarda en base de datos: se reconstruye desde movimientos.
 
@@ -67,3 +110,4 @@ export function splitExpenseEqually(amount: number, memberIds: string[]): Balanc
     }
   ];
 }
+

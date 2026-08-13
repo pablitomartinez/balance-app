@@ -3,25 +3,31 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
+import { useAuth } from "@/hooks/useAuth";
 import { useCreateHome } from "@/hooks/useCreateHome";
 import { useHome } from "@/hooks/useHome";
 
 export default function CreateHomePage() {
   const router = useRouter();
 
+  const { user, loading: authLoading } = useAuth();
   const { createHome, loading } = useCreateHome();
-  const { hasHome, loading: homeLoading } = useHome();
+
+  const {
+    hasHome,
+    loading: homeLoading,
+  } = useHome(user?.id ?? null);
 
   const [name, setName] = useState("");
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!homeLoading && hasHome) {
+    if (!authLoading && !homeLoading && hasHome) {
       router.replace("/dashboard");
     }
-  }, [homeLoading, hasHome, router]);
+  }, [authLoading, homeLoading, hasHome, router]);
 
-  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
 
     setError(null);
@@ -38,19 +44,21 @@ export default function CreateHomePage() {
     }
   }
 
-  if (homeLoading || hasHome) {
+  if (authLoading || homeLoading || hasHome) {
     return (
-      <main className="flex min-h-screen items-center justify-center">
-        <p className="text-muted-foreground">Cargando...</p>
+      <main className="flex min-h-screen items-center justify-center px-6">
+        <p className="text-sm text-muted-foreground">
+          Cargando información del hogar...
+        </p>
       </main>
     );
   }
 
   return (
-    <main className="flex min-h-screen items-center px-4 py-8">
-      <section className="mx-auto w-full max-w-sm">
-        <div className="mb-8">
-          <p className="text-sm font-bold uppercase tracking-wide text-primary">
+    <main className="flex min-h-screen items-center justify-center px-6">
+      <section className="w-full max-w-md">
+        <div className="mb-6">
+          <p className="text-sm font-semibold text-primary">
             Balance Hogar
           </p>
 
@@ -96,10 +104,10 @@ export default function CreateHomePage() {
 
           <Button
             className="w-full"
-            disabled={loading || !name.trim()}
+            disabled={loading || !name.trim() || !user}
             type="submit"
           >
-            Crear hogar
+            {loading ? "Creando..." : "Crear hogar"}
           </Button>
         </form>
       </section>

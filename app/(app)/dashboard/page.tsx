@@ -4,39 +4,49 @@ import { BalanceCard } from "@/components/dashboard/BalanceCard";
 import { PendingApprovalsList } from "@/components/dashboard/PendingApprovalsList";
 import { RecentExpensesList } from "@/components/dashboard/RecentExpensesList";
 import { Section } from "@/components/ui/Section";
+import { useAuth } from "@/hooks/useAuth";
 import { useHome } from "@/hooks/useHome";
+import { InvitationTest } from "@/components/home/InvitationTest";
 
-// Dashboard inicial. La pantalla muestra estructura real aunque los datos se conecten incrementalmente.
+// Dashboard inicial. La pantalla muestra estructura real aunque los datos
+// se conecten incrementalmente.
 export default function DashboardPage() {
+  const { user, loading: authLoading } = useAuth();
+
   const {
     balance,
     pendingApprovals,
     recentExpenses,
     home,
-    loading,
-  } = useHome();
+    loading: homeLoading,
+  } = useHome(user?.id ?? null);
+
+  const loading = authLoading || homeLoading;
 
   if (loading) {
     return (
-      <main className="flex min-h-screen items-center justify-center">
-        <p className="text-muted-foreground">Cargando...</p>
-      </main>
+      <div className="flex min-h-[40vh] items-center justify-center">
+        <p className="text-sm text-muted-foreground">
+          Cargando información del hogar...
+        </p>
+      </div>
     );
   }
 
   return (
     <div className="space-y-6">
       {home && (
-        <Section title="Mi hogar">
-          <p className="text-2xl font-bold text-foreground">
+        <div>
+          <h1 className="text-xl font-bold text-foreground">
             🏠 {home.name}
-          </p>
-        </Section>
+          </h1>
+        </div>
       )}
+
+      {home && <InvitationTest homeId={home.id} />}
 
       <div className="grid gap-6 md:grid-cols-[1.1fr_0.9fr]">
         <div className="space-y-6">
-        {/* <pre>{JSON.stringify(home, null, 2)}</pre> */}
           <BalanceCard balance={balance} />
 
           <Section title="Gastos recientes">
