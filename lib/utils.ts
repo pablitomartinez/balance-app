@@ -2,10 +2,13 @@
 
 export function formatCurrency(value: number): string {
   // Se usa ARS por el contexto local de la app; puede ajustarse luego desde settings.
+  const minimumFractionDigits = Number.isInteger(value) ? 0 : 2;
+
   return new Intl.NumberFormat("es-AR", {
     style: "currency",
     currency: "ARS",
-    maximumFractionDigits: 0
+    minimumFractionDigits,
+    maximumFractionDigits: 2,
   }).format(value);
 }
 

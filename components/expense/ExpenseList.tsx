@@ -1,6 +1,7 @@
 "use client";
 
 import type { ExpenseListItem } from "@/hooks/useExpenses";
+import { formatCurrency } from "@/lib/utils";
 
 type ExpenseListProps = {
   expenses: ExpenseListItem[];
@@ -18,14 +19,6 @@ const PAYMENT_METHOD_LABELS: Record<
   mercadopago: "Mercado Pago",
   other: "Otro",
 };
-
-function formatAmount(amount: number) {
-  return new Intl.NumberFormat("es-AR", {
-    style: "currency",
-    currency: "ARS",
-    maximumFractionDigits: 2,
-  }).format(amount);
-}
 
 function formatDate(date: string) {
   const parsedDate = new Date(`${date}T12:00:00`);
@@ -125,7 +118,7 @@ export function ExpenseList({
           </div>
 
           <p className="shrink-0 text-sm font-bold text-foreground">
-            {formatAmount(expense.amount)}
+            {formatCurrency(expense.amount)}
           </p>
         </div>
 
