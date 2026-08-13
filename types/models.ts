@@ -12,11 +12,19 @@ export type DashboardExpense = {
   id: string;
   description: string;
   amount: number;
+  expenseDate: string;
+  status: "approved";
+  categoryName: string | null;
+  paidBy: string;
   createdAt: string;
   paidByName: string;
 };
 
 export type PendingApproval = {
+  approvalId: string;
+  expenseId: string;
+  requesterId: string;
+  requesterName: string;
   id: string;
   title: string;
   amount: number;

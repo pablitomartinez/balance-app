@@ -13,18 +13,24 @@ type Home = {
   name: string;
 };
 
+const CURRENT_USER_NAME_FALLBACK = "Vos";
+const OTHER_MEMBER_NAME_FALLBACK = "La otra persona";
+
+function getDisplayName(name: string | null | undefined, fallback: string) {
+  return name?.trim() || fallback;
+}
+
 export function useHome(userId: string | null) {
   const [home, setHome] = useState<Home | null>(null);
-
+  const [currentUserName, setCurrentUserName] = useState<string | null>(null);
+  const [otherMemberName, setOtherMemberName] = useState<string | null>(null);
   const [balance, setBalance] = useState(() =>
     calculateBalanceFromShares([], "")
   );
-
   const [recentExpenses, setRecentExpenses] = useState<DashboardExpense[]>([]);
   const [pendingApprovals, setPendingApprovals] = useState<PendingApproval[]>(
     []
   );
-
   const [homeLoading, setHomeLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -36,17 +42,20 @@ export function useHome(userId: string | null) {
         if (!active) return;
 
         setHome(null);
+        setCurrentUserName(null);
+        setOtherMemberName(null);
         setBalance(calculateBalanceFromShares([], ""));
         setRecentExpenses([]);
         setPendingApprovals([]);
         setHomeLoading(false);
         setError(null);
-
         return;
       }
 
       setError(null);
       setHome(null);
+      setCurrentUserName(null);
+      setOtherMemberName(null);
       setBalance(calculateBalanceFromShares([], userId));
       setRecentExpenses([]);
       setPendingApprovals([]);
@@ -107,6 +116,7 @@ export function useHome(userId: string | null) {
       const [
         approvedExpensesResult,
         approvedSharesResult,
+        homeMembersResult,
         pendingApprovalsResult,
       ] = await Promise.all([
         supabase
@@ -142,14 +152,31 @@ export function useHome(userId: string | null) {
           .eq("expenses.status", "approved"),
 
         supabase
+          .from("home_members")
+          .select(`
+            profile_id,
+            profiles (
+              full_name
+            )
+          `)
+          .eq("home_id", currentHome.id),
+
+        supabase
           .from("approvals")
           .select(`
             id,
             expense_id,
-            profile_id,
-            status
+            expenses!inner (
+              id,
+              home_id,
+              description,
+              amount,
+              paid_by
+            )
           `)
-          .eq("status", "pending"),
+          .eq("profile_id", userId)
+          .eq("status", "pending")
+          .eq("expenses.home_id", currentHome.id),
       ]);
 
       if (!active) return;
@@ -165,6 +192,13 @@ export function useHome(userId: string | null) {
         console.error(
           "Error cargando shares:",
           approvedSharesResult.error
+        );
+      }
+
+      if (homeMembersResult.error) {
+        console.error(
+          "Error cargando miembros del hogar:",
+          homeMembersResult.error
         );
       }
 
@@ -193,7 +227,35 @@ export function useHome(userId: string | null) {
       );
 
       // ------------------------------------------------------------
-      // 4. Gastos recientes
+      // 4. Miembros del hogar
+      // ------------------------------------------------------------
+
+      const homeMembers = homeMembersResult.data ?? [];
+      const currentMember = homeMembers.find(
+        (member) => member.profile_id === userId
+      );
+      const otherMember = homeMembers.find(
+        (member) => member.profile_id !== userId
+      );
+      const currentProfile = currentMember?.profiles;
+      const otherProfile = otherMember?.profiles;
+      const currentMemberFullName = Array.isArray(currentProfile)
+        ? currentProfile[0]?.full_name
+        : currentProfile?.full_name;
+      const otherMemberFullName = Array.isArray(otherProfile)
+        ? otherProfile[0]?.full_name
+        : otherProfile?.full_name;
+      const dashboardCurrentUserName = getDisplayName(
+        currentMemberFullName,
+        CURRENT_USER_NAME_FALLBACK
+      );
+      const dashboardOtherMemberName = getDisplayName(
+        otherMemberFullName,
+        OTHER_MEMBER_NAME_FALLBACK
+      );
+
+      // ------------------------------------------------------------
+      // 5. Gastos recientes
       // ------------------------------------------------------------
 
       const dashboardExpenses: DashboardExpense[] = (
@@ -204,64 +266,57 @@ export function useHome(userId: string | null) {
           id: expense.id,
           description: expense.description,
           amount: Number(expense.amount),
+          expenseDate: expense.expense_date,
+          status: "approved",
+          categoryName:
+            Array.isArray(expense.categories) && expense.categories.length > 0
+              ? expense.categories[0].name
+              : null,
+          paidBy: expense.paid_by,
           createdAt: expense.expense_date,
           paidByName:
             expense.paid_by === userId
-              ? "Vos"
-              : "La otra persona",
+              ? dashboardCurrentUserName
+              : dashboardOtherMemberName,
         }));
 
-      // ------------------------------------------------------------
-      // 5. Pendientes de aprobación
-      // ------------------------------------------------------------
+      const dashboardPendingApprovals: PendingApproval[] = (
+        pendingApprovalsResult.data ?? []
+      ).flatMap((approval) => {
+        const expense = Array.isArray(approval.expenses)
+          ? approval.expenses[0]
+          : approval.expenses;
 
-      const pendingExpenseIds = new Set(
-        (pendingApprovalsResult.data ?? []).map(
-          (approval) => approval.expense_id
-        )
-      );
-
-      let dashboardPendingApprovals: PendingApproval[] = [];
-
-      if (pendingExpenseIds.size > 0) {
-        const { data: pendingExpenses, error: pendingExpensesError } =
-          await supabase
-            .from("expenses")
-            .select(`
-              id,
-              description,
-              amount,
-              paid_by
-            `)
-            .eq("home_id", currentHome.id)
-            .eq("status", "pending")
-            .in("id", Array.from(pendingExpenseIds));
-
-        if (pendingExpensesError) {
-          console.error(
-            "Error cargando gastos pendientes:",
-            pendingExpensesError
-          );
-        } else {
-          dashboardPendingApprovals = (pendingExpenses ?? []).map(
-            (expense) => ({
-              id: expense.id,
-              title: expense.description,
-              amount: Number(expense.amount),
-              requestedByName:
-                expense.paid_by === userId
-                  ? "Vos"
-                  : "La otra persona",
-            })
-          );
+        if (!expense) {
+          return [];
         }
-      }
+
+        const requesterName =
+          expense.paid_by === userId
+            ? dashboardCurrentUserName
+            : dashboardOtherMemberName;
+
+        return [
+          {
+            id: approval.id,
+            approvalId: approval.id,
+            expenseId: expense.id,
+            title: expense.description,
+            amount: Number(expense.amount),
+            requesterId: expense.paid_by,
+            requesterName,
+            requestedByName: requesterName,
+          },
+        ];
+      });
 
       // ------------------------------------------------------------
       // 6. Actualizar estado
       // ------------------------------------------------------------
 
       setHome(currentHome);
+      setCurrentUserName(dashboardCurrentUserName);
+      setOtherMemberName(dashboardOtherMemberName);
       setBalance(dashboardBalance);
       setRecentExpenses(dashboardExpenses);
       setPendingApprovals(dashboardPendingApprovals);
@@ -280,6 +335,8 @@ export function useHome(userId: string | null) {
     recentExpenses,
     pendingApprovals,
     home,
+    currentUserName,
+    otherMemberName,
     hasHome: home !== null,
     error,
     loading: homeLoading,
