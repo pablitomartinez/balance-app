@@ -12,7 +12,7 @@ export function PendingApprovalsList({ approvals }: PendingApprovalsListProps) {
     return (
       <EmptyState
         title="Sin aprobaciones pendientes"
-        description="Los gastos nuevos van a requerir confirmación de la otra persona."
+        description="Los gastos nuevos que requieran tu confirmación aparecerán acá."
       />
     );
   }
@@ -25,7 +25,7 @@ export function PendingApprovalsList({ approvals }: PendingApprovalsListProps) {
             <div>
               <p className="font-semibold text-foreground">{approval.title}</p>
               <p className="mt-1 text-xs text-muted-foreground">
-                Solicitado por {approval.requestedByName}
+                {approval.requesterName} creó este gasto
               </p>
             </div>
             <p className="text-sm font-bold text-warning">

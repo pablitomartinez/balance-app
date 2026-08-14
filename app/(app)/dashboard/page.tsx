@@ -6,18 +6,16 @@ import { RecentExpensesList } from "@/components/dashboard/RecentExpensesList";
 import { Section } from "@/components/ui/Section";
 import { useAuth } from "@/hooks/useAuth";
 import { useHome } from "@/hooks/useHome";
-import { InvitationTest } from "@/components/home/InvitationTest";
 
-// Dashboard inicial. La pantalla muestra estructura real aunque los datos
-// se conecten incrementalmente.
 export default function DashboardPage() {
   const { user, loading: authLoading } = useAuth();
-
   const {
     balance,
     pendingApprovals,
     recentExpenses,
     home,
+    currentUserName,
+    otherMemberName,
     loading: homeLoading,
   } = useHome(user?.id ?? null);
 
@@ -36,18 +34,19 @@ export default function DashboardPage() {
   return (
     <div className="space-y-6">
       {home && (
-        <div>
-          <h1 className="text-xl font-bold text-foreground">
-            🏠 {home.name}
+        <div className="min-w-0">
+          <h1 className="break-words text-2xl font-black text-foreground">
+            {currentUserName === "Vos" ? "Hola 👋" : `Hola, ${currentUserName} 👋`}
           </h1>
+          <p className="mt-1 break-words text-sm text-muted-foreground">
+            Así están las cuentas de {home.name}.
+          </p>
         </div>
       )}
 
-      {home && <InvitationTest homeId={home.id} />}
-
       <div className="grid gap-6 md:grid-cols-[1.1fr_0.9fr]">
         <div className="space-y-6">
-          <BalanceCard balance={balance} />
+          <BalanceCard balance={balance} otherMemberName={otherMemberName} />
 
           <Section title="Gastos recientes">
             <RecentExpensesList expenses={recentExpenses} />
