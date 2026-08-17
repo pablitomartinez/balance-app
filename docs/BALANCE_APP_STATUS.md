@@ -266,3 +266,147 @@ La validación funcional de las RPC existentes continúa siendo parte del cierre
 
 Próximo objetivo:
 conectar y validar el dashboard/balance con gastos aprobados.
+
+------------------------------------------------------------
+## 21. Checkpoint 2026-08-17
+
+### Estado de Git / rama
+
+El trabajo activo continúa en:
+
+`develop`
+
+Los cambios anteriores del Dashboard y del formatter ARS fueron committeados y pusheados a `origin/develop`.
+
+Últimos cambios relevantes:
+- `0d87014` — `feat: prepare dashboard presentation data`
+- `dde815c` — `fix: standardize ARS currency formatting`
+- `482a4fa` — `feat: improve dashboard presentation`
+
+### Dashboard
+
+El Dashboard dejó de ser un cascarón y actualmente consume datos reales preparados desde `useHome`.
+
+Muestra:
+- saludo del usuario;
+- nombre del hogar;
+- balance entre los dos miembros;
+- gastos recientes;
+- aprobaciones pendientes;
+- nombres reales de los miembros cuando existen en `profiles`.
+
+Se verificó manualmente con dos usuarios.
+
+Ejemplo actual:
+- Pablo ve: `Le debés a Agostina`
+- Agostina ve el balance correspondiente desde su perspectiva.
+- Los gastos recientes muestran quién pagó.
+- Las aprobaciones pendientes muestran quién creó el gasto.
+
+### Profiles / nombres
+
+Se detectó que `profiles.full_name` estaba en `NULL` para los usuarios de prueba.
+
+Se cargaron nombres de prueba directamente en Supabase:
+
+- `91f7665e-ff81-499a-ae62-6be93e1f33d0` → Pablo
+- `d1cd4c5d-51bc-4eb8-8dfc-f1745f6c24c6` → Agostina
+
+La aplicación ahora puede obtener esos nombres.
+
+La edición de nombre desde `/settings` queda fuera del alcance inmediato del MVP y se resolverá posteriormente.
+
+### RLS de profiles / home_members
+
+Se agregó la migración:
+
+`20260814_fix_profile_and_home_member_read_rls.sql`
+
+Objetivo:
+- permitir que un miembro lea los demás miembros de su hogar;
+- permitir leer los `profiles` correspondientes a miembros del mismo hogar;
+- mantener el acceso protegido por RLS;
+- utilizar `is_home_member(uuid)` como función `SECURITY DEFINER` para evitar problemas de evaluación recursiva.
+
+La migración fue aplicada correctamente al proyecto remoto mediante:
+
+`supabase.cmd db push`
+
+`supabase.cmd migration list` confirmó que la migración `20260814` está presente tanto localmente como remotamente.
+
+### Currency formatting
+
+Se centralizó el formato ARS en:
+
+`lib/utils.ts`
+
+`formatCurrency()` actualmente muestra:
+- enteros sin decimales;
+- importes con centavos con dos decimales;
+- formato `es-AR`.
+
+Ejemplos:
+- `5` → `$ 5`
+- `5000` → `$ 5.000`
+- `9999.97` → `$ 9.999,97`
+- `1000000.5` → `$ 1.000.000,50`
+
+`ExpenseList` utiliza el formatter común.
+
+### Estado actual del MVP
+
+El núcleo funcional ya permite:
+
+`Auth → Home → Invite / Join → Expense → 50/50 shares → Approval → Approved / Rejected → Dashboard`
+
+La seguridad base de las mutaciones de negocio fue endurecida mediante:
+
+`20260811120000_harden_business_rls.sql`
+
+y la lectura de miembros/perfiles fue corregida mediante:
+
+`20260814_fix_profile_and_home_member_read_rls.sql`
+
+### Próximo objetivo
+
+El siguiente foco es completar el flujo de creación de gastos y, especialmente, **categorías**.
+
+Las categorías son necesarias para que Balance no sea solamente un registro de movimientos, sino una herramienta útil para entender en qué se está gastando.
+
+Prioridad inmediata:
+
+1. Auditar `categories` y sus datos actuales.
+2. Verificar el modelo de categorías por hogar.
+3. Corregir/integrar el selector de categoría en la creación de gastos.
+4. Validar que `create_expense()` reciba y valide correctamente la categoría.
+5. Mostrar la categoría en los gastos.
+6. Probar el flujo completo con los dos usuarios.
+7. Continuar con las funcionalidades estrictamente necesarias para poder empezar a utilizar Balance en la vida real.
+
+### Fuera del foco inmediato
+
+No priorizar todavía:
+- edición de nombre desde Ajustes;
+- mejoras estéticas adicionales del Dashboard;
+- responsive adicional si la interfaz actual funciona correctamente;
+- generalización a más de dos miembros;
+- servicios recurrentes;
+- transferencias avanzadas;
+- analytics;
+- realtime;
+- funcionalidades empresariales.
+
+### Criterio de cierre del MVP
+
+Balance se considerará listo para uso real cuando Pablo y Agostina puedan:
+
+1. crear/unirse a un hogar;
+2. invitar al segundo usuario;
+3. crear un gasto categorizado;
+4. indicar correctamente quién pagó;
+5. generar automáticamente el split 50/50;
+6. aprobar o rechazar el gasto desde el otro usuario;
+7. ver únicamente gastos aprobados reflejados en el balance;
+8. consultar gastos recientes y sus categorías;
+9. registrar los pagos necesarios para saldar el balance;
+10. repetir el flujo de forma confiable sin intervención manual desde Supabase.

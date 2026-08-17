@@ -118,11 +118,7 @@ export function useExpenses(homeId: string | null) {
         paymentMethod: expense.payment_method,
         status: expense.status,
         categoryId: expense.category_id,
-        categoryName:
-          Array.isArray(expense.categories) &&
-          expense.categories.length > 0
-            ? expense.categories[0].name
-            : null,
+        categoryName: expense.categories?.name ?? null,
       });
     }
 
