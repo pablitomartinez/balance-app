@@ -55,6 +55,32 @@ function isThisWeek(date: string) {
   return parsedDate >= startOfWeek && !isToday(date);
 }
 
+function getStatusLabel(status: ExpenseListItem["status"]) {
+  switch (status) {
+    case "pending":
+      return "Pendiente";
+
+    case "approved":
+      return "Aprobado";
+
+    case "rejected":
+      return "Rechazado";
+  }
+}
+
+function getStatusClassName(status: ExpenseListItem["status"]) {
+  switch (status) {
+    case "pending":
+      return "border-warning/30 bg-warning/10 text-warning";
+
+    case "approved":
+      return "border-success/30 bg-success/10 text-success";
+
+    case "rejected":
+      return "border-destructive/30 bg-destructive/10 text-destructive";
+  }
+}
+
 export function ExpenseList({
   expenses,
   loading = false,
@@ -129,11 +155,13 @@ export function ExpenseList({
               : formatDate(expense.expenseDate)}
           </span>
 
-          {expense.status === "pending" && (
-            <span className="text-xs font-medium text-muted-foreground">
-              Pendiente
-            </span>
-          )}
+          <span
+            className={`rounded-full border px-2.5 py-1 text-xs font-semibold ${getStatusClassName(
+              expense.status
+            )}`}
+          >
+            {getStatusLabel(expense.status)}
+          </span>
         </div>
       </article>
     );

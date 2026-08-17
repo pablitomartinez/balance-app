@@ -83,7 +83,7 @@ export default function ExpensesPage() {
         </p>
       )}
 
-      <Section title="Datos del gasto">
+      {/* <Section title="Datos del gasto">
         <ExpenseFormShell
           homeId={home.id}
           userId={user.id}
@@ -106,6 +106,31 @@ export default function ExpensesPage() {
             />
           )}
         </Section>
+      </Section> */}
+      <Section title="Datos del gasto">
+        <ExpenseFormShell
+          homeId={home.id}
+          userId={user.id}
+          categories={categories}
+          categoriesLoading={categoriesLoading}
+          onCreated={reloadExpenses}
+        />
+      </Section>
+
+      <Section title="Gastos recientes">
+        {expensesError ? (
+          <p
+            role="alert"
+            className="rounded-md border border-destructive/20 bg-destructive/5 px-3 py-2 text-sm text-destructive"
+          >
+            {expensesError}
+          </p>
+        ) : (
+          <ExpenseList
+            expenses={expenses}
+            loading={expensesLoading}
+          />
+        )}
       </Section>
     </div>
   );
