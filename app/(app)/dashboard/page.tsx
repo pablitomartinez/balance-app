@@ -1,16 +1,17 @@
 "use client";
-
 import { BalanceCard } from "@/components/dashboard/BalanceCard";
 import { PendingApprovalsList } from "@/components/dashboard/PendingApprovalsList";
 import { RecentExpensesList } from "@/components/dashboard/RecentExpensesList";
 import { Section } from "@/components/ui/Section";
 import { useAuth } from "@/hooks/useAuth";
 import { useHome } from "@/hooks/useHome";
+import { formatCurrency } from "@/lib/utils";
 
 export default function DashboardPage() {
   const { user, loading: authLoading } = useAuth();
   const {
     balance,
+    monthlyTotal,
     pendingApprovals,
     recentExpenses,
     home,
@@ -46,7 +47,24 @@ export default function DashboardPage() {
 
       <div className="grid gap-6 md:grid-cols-[1.1fr_0.9fr]">
         <div className="space-y-6">
-          <BalanceCard balance={balance} otherMemberName={otherMemberName} />
+          <section className="rounded-md bg-card p-5 shadow-soft">
+            <p className="text-sm font-semibold text-muted-foreground">
+              Resumen del mes
+            </p>
+
+            <p className="mt-2 text-3xl font-black text-foreground">
+              {formatCurrency(monthlyTotal)}
+            </p>
+
+            <p className="mt-2 text-sm text-muted-foreground">
+              Total gastado en gastos compartidos durante este mes.
+            </p>
+          </section>
+
+          <BalanceCard
+            balance={balance}
+            otherMemberName={otherMemberName}
+          />
 
           <Section title="Gastos recientes">
             <RecentExpensesList expenses={recentExpenses} />

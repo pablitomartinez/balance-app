@@ -27,6 +27,7 @@ export function useHome(userId: string | null) {
   const [balance, setBalance] = useState(() =>
     calculateBalanceFromShares([], "")
   );
+  const [monthlyTotal, setMonthlyTotal] = useState(0);
   const [recentExpenses, setRecentExpenses] = useState<DashboardExpense[]>([]);
   const [pendingApprovals, setPendingApprovals] = useState<PendingApproval[]>(
     []
@@ -46,6 +47,7 @@ export function useHome(userId: string | null) {
         setOtherMemberName(null);
         setBalance(calculateBalanceFromShares([], ""));
         setRecentExpenses([]);
+        setMonthlyTotal(0);
         setPendingApprovals([]);
         setHomeLoading(false);
         setError(null);
@@ -58,6 +60,7 @@ export function useHome(userId: string | null) {
       setOtherMemberName(null);
       setBalance(calculateBalanceFromShares([], userId));
       setRecentExpenses([]);
+      setMonthlyTotal(0);
       setPendingApprovals([]);
       setHomeLoading(true);
 
@@ -254,8 +257,28 @@ export function useHome(userId: string | null) {
         OTHER_MEMBER_NAME_FALLBACK
       );
 
+
       // ------------------------------------------------------------
-      // 5. Gastos recientes
+      // 5. Resumen del mes
+      // ------------------------------------------------------------
+
+      const now = new Date();
+      const currentYear = now.getFullYear();
+      const currentMonth = now.getMonth();
+
+      const currentMonthTotal = (approvedExpensesResult.data ?? [])
+        .filter((expense) => {
+          const expenseDate = new Date(`${expense.expense_date}T12:00:00`);
+
+          return (
+            expenseDate.getFullYear() === currentYear &&
+            expenseDate.getMonth() === currentMonth
+          );
+        })
+        .reduce((total, expense) => total + Number(expense.amount), 0);
+
+      // ------------------------------------------------------------
+      // 6. Gastos recientes
       // ------------------------------------------------------------
 
       const dashboardExpenses: DashboardExpense[] = (
@@ -311,13 +334,14 @@ export function useHome(userId: string | null) {
       });
 
       // ------------------------------------------------------------
-      // 6. Actualizar estado
+      // 7. Actualizar estado
       // ------------------------------------------------------------
 
       setHome(currentHome);
       setCurrentUserName(dashboardCurrentUserName);
       setOtherMemberName(dashboardOtherMemberName);
       setBalance(dashboardBalance);
+      setMonthlyTotal(currentMonthTotal);
       setRecentExpenses(dashboardExpenses);
       setPendingApprovals(dashboardPendingApprovals);
       setHomeLoading(false);
@@ -332,6 +356,7 @@ export function useHome(userId: string | null) {
 
   return {
     balance,
+    monthlyTotal,
     recentExpenses,
     pendingApprovals,
     home,
