@@ -9,10 +9,9 @@ const items = [
   { href: "/expenses", label: "Gastos" },
   { href: "/approvals", label: "Aprobar" },
   // { href: "/transfers", label: "Pagos" },
-  { href: "/settings", label: "Ajustes" }
+  { href: "/settings", label: "Ajustes" },
 ];
 
-// Navegación simple y legible para móvil y escritorio.
 export function AppNav() {
   const pathname = usePathname();
 

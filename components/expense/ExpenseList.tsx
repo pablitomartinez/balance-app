@@ -1,6 +1,7 @@
 "use client";
 
 import type { ExpenseListItem } from "@/hooks/useExpenses";
+import { Skeleton } from "@/components/ui/Skeleton";
 import { formatCurrency } from "@/lib/utils";
 
 type ExpenseListProps = {
@@ -81,16 +82,36 @@ function getStatusClassName(status: ExpenseListItem["status"]) {
   }
 }
 
+function ExpenseSkeleton() {
+  return (
+    <article className="rounded-md border border-border bg-card p-4">
+      <div className="flex items-start justify-between gap-4">
+        <div className="min-w-0 flex-1 space-y-2">
+          <Skeleton className="h-4 w-2/3" />
+          <Skeleton className="h-3 w-1/2" />
+        </div>
+
+        <Skeleton className="h-5 w-20 shrink-0" />
+      </div>
+
+      <div className="mt-3 flex items-center justify-between gap-3">
+        <Skeleton className="h-3 w-12" />
+        <Skeleton className="h-6 w-20 rounded-full" />
+      </div>
+    </article>
+  );
+}
+
 export function ExpenseList({
   expenses,
   loading = false,
 }: ExpenseListProps) {
   if (loading) {
     return (
-      <div className="rounded-md border border-border bg-card p-4">
-        <p className="text-sm text-muted-foreground">
-          Cargando gastos...
-        </p>
+      <div className="space-y-3">
+        <ExpenseSkeleton />
+        <ExpenseSkeleton />
+        <ExpenseSkeleton />
       </div>
     );
   }

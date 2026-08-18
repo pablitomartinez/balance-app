@@ -16,13 +16,7 @@ export type CreateExpenseInput = {
   paidBy: string;
 };
 
-
 export async function createExpense(input: CreateExpenseInput) {
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  
   const { data, error } = await supabase.rpc("create_expense", {
     p_home_id: input.homeId,
     p_description: input.description,

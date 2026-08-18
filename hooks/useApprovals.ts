@@ -20,6 +20,9 @@ export function useApprovals(userId: string | null, homeId: string | null) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [removingApprovalId, setRemovingApprovalId] = useState<string | null>(
+    null
+  );
 
   const loadApprovals = useCallback(async () => {
     if (!userId || !homeId) {
@@ -31,10 +34,6 @@ export function useApprovals(userId: string | null, homeId: string | null) {
 
     setLoading(true);
     setError(null);
-
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
 
     const { data, error: approvalsError } = await supabase
       .from("approvals")
@@ -102,6 +101,14 @@ export function useApprovals(userId: string | null, homeId: string | null) {
     loadApprovals();
   }, [loadApprovals]);
 
+  const finishRemovingApproval = useCallback((expenseId: string) => {
+    setApprovals((current) =>
+      current.filter((approval) => approval.expenseId !== expenseId)
+    );
+
+    setRemovingApprovalId(null);
+  }, []);
+
   const approve = useCallback(
     async (expenseId: string) => {
       setActionLoading(expenseId);
@@ -109,7 +116,14 @@ export function useApprovals(userId: string | null, homeId: string | null) {
 
       try {
         await approveExpense(expenseId);
-        await loadApprovals();
+
+        window.dispatchEvent(new Event("balance:approval-change"));
+
+        setRemovingApprovalId(expenseId);
+
+        window.setTimeout(() => {
+          finishRemovingApproval(expenseId);
+        }, 220);
       } catch (error) {
         setError(
           error instanceof Error
@@ -120,7 +134,7 @@ export function useApprovals(userId: string | null, homeId: string | null) {
         setActionLoading(null);
       }
     },
-    [loadApprovals]
+    [finishRemovingApproval]
   );
 
   const reject = useCallback(
@@ -130,7 +144,14 @@ export function useApprovals(userId: string | null, homeId: string | null) {
 
       try {
         await rejectExpense(expenseId, comment);
-        await loadApprovals();
+
+        window.dispatchEvent(new Event("balance:approval-change"));
+
+        setRemovingApprovalId(expenseId);
+
+        window.setTimeout(() => {
+          finishRemovingApproval(expenseId);
+        }, 220);
       } catch (error) {
         setError(
           error instanceof Error
@@ -141,7 +162,7 @@ export function useApprovals(userId: string | null, homeId: string | null) {
         setActionLoading(null);
       }
     },
-    [loadApprovals]
+    [finishRemovingApproval]
   );
 
   return {
@@ -149,6 +170,7 @@ export function useApprovals(userId: string | null, homeId: string | null) {
     loading,
     error,
     actionLoading,
+    removingApprovalId,
     approve,
     reject,
     reload: loadApprovals,
