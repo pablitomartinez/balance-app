@@ -8,11 +8,16 @@ type AuthState = {
   user: User | null;
   loading: boolean;
   error: string | null;
-  signInWithEmail: (email: string) => Promise<boolean>;
+  signInWithEmail: (email: string, password: string) => Promise<boolean>;
+  signUpWithEmail: (
+    email: string,
+    password: string
+  ) => Promise<{ success: boolean; needsConfirmation: boolean }>;
   signOut: () => Promise<void>;
 };
 
-// Este hook maneja autenticación con Supabase (email OTP temporal)
+// Autenticación principal de Balance mediante email + contraseña.
+// La sesión persistente es gestionada por Supabase.
 export function useAuth(): AuthState {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
@@ -26,14 +31,14 @@ export function useAuth(): AuthState {
 
       const { data, error } = await supabase.auth.getSession();
 
-      if (active) {
-        if (error) {
-          setError(error.message);
-        }
+      if (!active) return;
 
-        setUser(data.session?.user ?? null);
-        setLoading(false);
+      if (error) {
+        setError(error.message);
       }
+
+      setUser(data.session?.user ?? null);
+      setLoading(false);
     }
 
     loadSession();
@@ -51,25 +56,53 @@ export function useAuth(): AuthState {
     };
   }, []);
 
-  // Login por email (sin Google, sin OAuth)
-  async function signInWithEmail(email: string): Promise<boolean> {
+  async function signInWithEmail(
+    email: string,
+    password: string
+  ): Promise<boolean> {
     setError(null);
-  
-    const { error } = await supabase.auth.signInWithOtp({
-      email,
-      options: {
-        emailRedirectTo: process.env.NEXT_PUBLIC_SITE_URL,
-      },
+
+    const { error } = await supabase.auth.signInWithPassword({
+      email: email.trim(),
+      password,
     });
-  
+
     if (error) {
       setError(error.message);
       return false;
     }
-  
+
     return true;
   }
-  
+
+  async function signUpWithEmail(
+    email: string,
+    password: string
+  ): Promise<{
+    success: boolean;
+    needsConfirmation: boolean;
+  }> {
+    setError(null);
+
+    const { data, error } = await supabase.auth.signUp({
+      email: email.trim(),
+      password,
+    });
+
+    if (error) {
+      setError(error.message);
+
+      return {
+        success: false,
+        needsConfirmation: false,
+      };
+    }
+
+    return {
+      success: true,
+      needsConfirmation: !data.session,
+    };
+  }
 
   async function signOut() {
     setError(null);
@@ -86,6 +119,7 @@ export function useAuth(): AuthState {
     loading,
     error,
     signInWithEmail,
+    signUpWithEmail,
     signOut,
   };
 }
