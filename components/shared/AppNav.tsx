@@ -8,6 +8,7 @@ const items = [
   { href: "/dashboard", label: "Inicio" },
   { href: "/expenses", label: "Gastos" },
   { href: "/approvals", label: "Aprobar" },
+  { href: "/personal-loans", label: "Préstamos" },
   // { href: "/transfers", label: "Pagos" },
   { href: "/settings", label: "Ajustes" },
 ];
@@ -17,7 +18,7 @@ export function AppNav() {
 
   return (
     <nav className="fixed inset-x-0 bottom-0 z-10 border-t border-border bg-card md:static md:border-t-0 md:bg-transparent">
-      <div className="mx-auto grid max-w-5xl grid-cols-4 gap-1 px-2 py-2 md:flex md:px-4">
+      <div className="mx-auto grid max-w-5xl grid-cols-5 gap-1 px-2 py-2 md:flex md:px-4">
         {items.map((item) => {
           const active = pathname === item.href;
 

@@ -1,13 +1,17 @@
 "use client";
 
 import { BalanceCard } from "@/components/dashboard/BalanceCard";
+import { PersonalDebtCard } from "@/components/personal-loans/PersonalDebtCard";
+import { Button } from "@/components/ui/Button";
 import { PendingApprovalsList } from "@/components/dashboard/PendingApprovalsList";
 import { RecentExpensesList } from "@/components/dashboard/RecentExpensesList";
 import { Section } from "@/components/ui/Section";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { useAuth } from "@/hooks/useAuth";
 import { useHome } from "@/hooks/useHome";
+import { usePersonalLoans } from "@/hooks/usePersonalLoans";
 import { formatCurrency } from "@/lib/utils";
+import Link from "next/link";
 
 function DashboardSkeleton() {
   return (
@@ -54,8 +58,13 @@ export default function DashboardPage() {
     otherMemberName,
     loading: homeLoading,
   } = useHome(user?.id ?? null);
+  const {
+    totalPersonalDebt,
+    direction: personalDebtDirection,
+    loading: personalLoansLoading,
+  } = usePersonalLoans(home?.id ?? null, user?.id ?? null);
 
-  const loading = authLoading || homeLoading;
+  const loading = authLoading || homeLoading || personalLoansLoading;
 
   if (loading) {
     return <DashboardSkeleton />;
@@ -97,6 +106,18 @@ export default function DashboardPage() {
             balance={balance}
             otherMemberName={otherMemberName}
           />
+
+          <PersonalDebtCard
+            amount={totalPersonalDebt}
+            direction={personalDebtDirection}
+            otherMemberName={otherMemberName}
+          />
+
+          <Link href="/personal-loans" className="block">
+            <Button type="button" className="w-full">
+              Registrar préstamo personal
+            </Button>
+          </Link>
 
           <Section title="Gastos recientes">
             <RecentExpensesList expenses={recentExpenses} />
