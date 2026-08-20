@@ -32,7 +32,7 @@ export default function LoginPage() {
       if (data) {
         router.replace("/dashboard");
       } else {
-        router.replace("/create-home");
+        router.replace("/home-entry");
       }
     }
 
