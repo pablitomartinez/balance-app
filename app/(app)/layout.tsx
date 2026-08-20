@@ -1,7 +1,8 @@
 import { AppHeader } from "@/components/shared/AppHeader";
 import { AppNav } from "@/components/shared/AppNav";
 import { AuthGuard } from "@/components/shared/AuthGuard";
-
+import { HelpWidget } from "@/components/shared/HelpWidget";
+import { Onboarding } from "@/components/shared/Onboarding";
 // Layout privado. Todas las pantallas del hogar comparten protección, header y navegación.
 export default function AppLayout({
   children
@@ -14,6 +15,8 @@ export default function AppLayout({
         <AppHeader />
         <AppNav />
         <main className="mx-auto w-full max-w-5xl px-4 py-6 md:py-8">{children}</main>
+        <HelpWidget />
+        <Onboarding />
       </div>
     </AuthGuard>
   );
