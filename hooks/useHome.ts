@@ -22,6 +22,7 @@ function getDisplayName(name: string | null | undefined, fallback: string) {
 
 export function useHome(userId: string | null) {
   const [home, setHome] = useState<Home | null>(null);
+  const [memberCount, setMemberCount] = useState<number | null>(null);
   const [currentUserName, setCurrentUserName] = useState<string | null>(null);
   const [otherMemberName, setOtherMemberName] = useState<string | null>(null);
   const [balance, setBalance] = useState(() =>
@@ -43,6 +44,7 @@ export function useHome(userId: string | null) {
         if (!active) return;
 
         setHome(null);
+        setMemberCount(null);
         setCurrentUserName(null);
         setOtherMemberName(null);
         setBalance(calculateBalanceFromShares([], ""));
@@ -56,6 +58,7 @@ export function useHome(userId: string | null) {
 
       setError(null);
       setHome(null);
+      setMemberCount(null);
       setCurrentUserName(null);
       setOtherMemberName(null);
       setBalance(calculateBalanceFromShares([], userId));
@@ -82,12 +85,14 @@ export function useHome(userId: string | null) {
       if (membershipError) {
         setError("No se pudo cargar la información del hogar.");
         setHome(null);
+        setMemberCount(null);
         setHomeLoading(false);
         return;
       }
 
       if (!membership) {
         setHome(null);
+        setMemberCount(null);
         setHomeLoading(false);
         return;
       }
@@ -106,6 +111,7 @@ export function useHome(userId: string | null) {
       if (homeError) {
         setError("No se pudo cargar la información del hogar.");
         setHome(null);
+        setMemberCount(null);
         setHomeLoading(false);
         return;
       }
@@ -234,6 +240,9 @@ export function useHome(userId: string | null) {
       // ------------------------------------------------------------
 
       const homeMembers = homeMembersResult.data ?? [];
+      const currentMemberCount = homeMembersResult.error
+        ? null
+        : homeMembers.length;
       const currentMember = homeMembers.find(
         (member) => member.profile_id === userId
       );
@@ -338,6 +347,7 @@ export function useHome(userId: string | null) {
       // ------------------------------------------------------------
 
       setHome(currentHome);
+      setMemberCount(currentMemberCount);
       setCurrentUserName(dashboardCurrentUserName);
       setOtherMemberName(dashboardOtherMemberName);
       setBalance(dashboardBalance);
@@ -360,6 +370,7 @@ export function useHome(userId: string | null) {
     recentExpenses,
     pendingApprovals,
     home,
+    memberCount,
     currentUserName,
     otherMemberName,
     hasHome: home !== null,

@@ -34,7 +34,7 @@ export default function CreateHomePage() {
 
     try {
       await createHome(name);
-      router.replace("/dashboard");
+      router.replace("/invite");
     } catch (error) {
       setError(
         error instanceof Error
