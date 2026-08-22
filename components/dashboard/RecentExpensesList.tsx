@@ -49,7 +49,7 @@ export function RecentExpensesList({ expenses }: RecentExpensesListProps) {
   }
 
   return (
-    <div className="divide-y divide-border rounded-md border border-border bg-card">
+    <div className="divide-y divide-border rounded-md border border-border bg-card shadow-soft">
       {expenses.map((expense) => {
         const details = [
           `${expense.paidByName} pagó`,

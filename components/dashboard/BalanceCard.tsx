@@ -28,7 +28,7 @@ export function BalanceCard({ balance, otherMemberName }: BalanceCardProps) {
   const message = getBalanceMessage(balance.direction, otherMemberName);
 
   return (
-    <div className="rounded-md bg-primary p-5 text-primary-foreground shadow-soft">
+    <div className="rounded-lg border border-primary-hover bg-primary p-5 text-primary-foreground shadow-soft">
       <p className="break-words text-sm font-semibold text-primary-foreground">
         {message}
       </p>

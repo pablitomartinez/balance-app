@@ -17,11 +17,11 @@ function message(direction: PersonalDebtDirection, otherMemberName: string | nul
 
 export function PersonalDebtCard({ amount, direction, otherMemberName }: PersonalDebtCardProps) {
   return (
-    <section className="rounded-md border border-border bg-card p-5 shadow-soft">
+    <section className="rounded-lg border border-brand-border bg-card p-5 shadow-soft">
       <p className="text-sm font-semibold text-muted-foreground">Deuda personal</p>
       <p className="mt-2 text-lg font-bold text-foreground">{message(direction, otherMemberName)}</p>
       <p className="mt-2 text-3xl font-black text-foreground">{formatCurrency(amount)}</p>
-      <Link href="/personal-loans" className="mt-4 inline-block text-sm font-semibold text-primary hover:underline">Ver préstamos</Link>
+      <Link href="/personal-loans" className="mt-4 inline-block rounded-sm text-sm font-semibold text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">Ver préstamos</Link>
     </section>
   );
 }

@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
@@ -53,7 +54,18 @@ export default function LoginPage() {
     <main className="flex min-h-screen items-center px-4 py-8">
       <section className="mx-auto w-full max-w-sm">
         <div className="mb-8">
-          <p className="text-sm font-bold uppercase tracking-wide text-primary">
+          <div className="mb-5 flex h-24 w-24 items-center justify-center rounded-full border border-brand-border bg-brand-muted">
+            <Image
+              src="/logo.png"
+              alt="Pasiflora de Balance"
+              width={80}
+              height={80}
+              className="h-20 w-20 object-contain"
+              priority
+            />
+          </div>
+
+          <p className="text-sm font-bold uppercase tracking-[0.12em] text-primary">
             Balance Hogar
           </p>
 
@@ -82,7 +94,7 @@ export default function LoginPage() {
               placeholder="tu@email.com"
               value={email}
               onChange={(event) => setEmail(event.target.value)}
-              className="w-full rounded-md border border-border bg-card p-3 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+              className="w-full rounded-md border border-input bg-card p-3 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-ring focus:ring-offset-1 focus:ring-offset-background"
             />
           </div>
 
@@ -101,7 +113,7 @@ export default function LoginPage() {
               placeholder="Tu contraseña"
               value={password}
               onChange={(event) => setPassword(event.target.value)}
-              className="w-full rounded-md border border-border bg-card p-3 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+              className="w-full rounded-md border border-input bg-card p-3 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-ring focus:ring-offset-1 focus:ring-offset-background"
             />
           </div>
 
