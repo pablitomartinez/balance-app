@@ -37,25 +37,29 @@
    * Brand
    * ------------------------------------------------------------------ */
 
-  --primary: #9d6e5a;
+  --primary: #76558f;
+  --primary-hover: #68487f;
   --primary-foreground: #ffffff;
 
-  --secondary: #bdad72;
+  --secondary: #d2c28f;
   --secondary-foreground: #2d2d2d;
 
-  --accent: #cfb18d;
-  --accent-foreground: #2d2d2d;
+  --accent: #d8c7e3;
+  --accent-foreground: #493456;
+
+  --brand-muted: #f1eaf5;
+  --brand-border: #d8c7e3;
 
   /* ------------------------------------------------------------------
    * Neutral
    * ------------------------------------------------------------------ */
 
-  --muted: #f4f0ea;
-  --muted-foreground: #7e7667;
+  --muted: #f3efeb;
+  --muted-foreground: #706a63;
 
-  --border: #e8ddd3;
-  --input: #e8ddd3;
-  --ring: #9d6e5a;
+  --border: #e5ddd7;
+  --input: #ded3cc;
+  --ring: #76558f;
 
   /* ------------------------------------------------------------------
    * Feedback
@@ -79,9 +83,11 @@
 
   --radius: 14px;
 
-  --shadow-soft: 0 16px 40px rgba(63, 36, 31, 0.08);
+  --shadow-soft:
+    0 1px 2px rgba(65, 48, 72, 0.04),
+    0 8px 24px rgba(65, 48, 72, 0.06);
 
-  --background-glow: rgba(207, 177, 141, 0.2);
+  --background-glow: rgba(216, 199, 227, 0.28);
 }
 
 * {

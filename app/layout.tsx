@@ -40,7 +40,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#9D6E5A",
+  themeColor: "#76558F",
 };
 
 // Este layout raíz define la estructura HTML común de toda la aplicación.

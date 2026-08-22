@@ -20,6 +20,7 @@ const config: Config = {
         "popover-foreground": "var(--popover-foreground)",
       
         primary: "var(--primary)",
+        "primary-hover": "var(--primary-hover)",
         "primary-foreground": "var(--primary-foreground)",
       
         secondary: "var(--secondary)",
@@ -27,6 +28,9 @@ const config: Config = {
       
         accent: "var(--accent)",
         "accent-foreground": "var(--accent-foreground)",
+
+        "brand-muted": "var(--brand-muted)",
+        "brand-border": "var(--brand-border)",
       
         muted: "var(--muted)",
         "muted-foreground": "var(--muted-foreground)",

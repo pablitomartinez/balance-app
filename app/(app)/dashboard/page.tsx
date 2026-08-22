@@ -86,7 +86,7 @@ export default function DashboardPage() {
         </div>
       )}
 
-      <section className="rounded-md bg-card p-5 shadow-soft">
+      <section className="rounded-lg border border-border bg-card p-5 shadow-soft">
         <p className="text-sm font-semibold text-muted-foreground">
           Resumen del mes
         </p>

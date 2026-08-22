@@ -38,7 +38,7 @@ export default function HomeEntryPage() {
           <Link
             key={href}
             href={href}
-            className="group flex items-start gap-4 rounded-lg border border-border bg-card p-5 transition hover:bg-muted focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
+            className="group flex items-start gap-4 rounded-lg border border-border bg-card p-5 shadow-soft transition hover:bg-muted focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
           >
             <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
               <Icon aria-hidden="true" className="h-5 w-5" />

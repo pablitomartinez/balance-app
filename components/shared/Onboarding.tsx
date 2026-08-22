@@ -5,41 +5,49 @@ import {
   CheckCircle2,
   HandCoins,
   Home,
+  KeyRound,
   ReceiptText,
   X,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 
-const STORAGE_KEY = "balance_onboarding_seen_v1";
+const STORAGE_KEY = "balance_onboarding_seen_v2";
 
 const slides = [
   {
     icon: Home,
-    eyebrow: "Tu hogar",
-    title: "Las cuentas de la casa, claras",
+    eyebrow: "Balance",
+    title: "Las cuentas de casa, más simples",
     description:
-      "Registrá los gastos compartidos y Balance calcula automáticamente cuánto le corresponde a cada uno.",
+      "Organizá los gastos compartidos y las deudas personales en un solo lugar.",
+  },
+  {
+    icon: KeyRound,
+    eyebrow: "Tu hogar",
+    title: "Primero conecten sus cuentas",
+    description:
+      "Una persona crea el hogar y comparte un código. La otra simplemente se une con ese código.",
   },
   {
     icon: CheckCircle2,
-    eyebrow: "Gastos compartidos",
+    eyebrow: "Gastos del hogar",
     title: "Uno registra. El otro confirma.",
     description:
-      "Los gastos del hogar se dividen 50/50 y sólo afectan el balance cuando la otra persona los aprueba.",
+      "Los gastos de la casa se dividen 50/50 y la otra persona puede aprobarlos antes de que afecten el balance.",
   },
   {
     icon: HandCoins,
     eyebrow: "Préstamos personales",
     title: "Lo personal queda separado",
     description:
-      "Si uno adelanta dinero exclusivamente por el otro, registralo como préstamo personal sin mezclarlo con los gastos de la casa.",
+      "Si uno le presta dinero al otro, registralo aparte. Podés hacer pagos parciales sin mezclarlo con los gastos del hogar.",
   },
   {
     icon: ReceiptText,
     eyebrow: "Todo en un lugar",
-    title: "Sabé siempre cómo están las cuentas",
+    title: "Siempre sabés cómo están las cuentas",
     description:
-      "Consultá gastos, deuda del hogar y préstamos personales desde una misma app, sin volver al cuaderno.",
+      "Consultá cuánto gastaron, quién le debe a quién y qué préstamos siguen pendientes.",
   },
 ];
 
