@@ -8,7 +8,7 @@ export function HelpWidget() {
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="fixed bottom-24 right-4 z-40 md:bottom-6 md:right-6">
+    <div className="fixed bottom-24 right-4 z-40 lg:hidden">
       <div
         className={[
           "absolute bottom-16 right-0 w-72 origin-bottom-right transition-all duration-200 ease-out",
