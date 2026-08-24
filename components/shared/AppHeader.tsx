@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { SignOutButton } from "@/components/shared/SignOutButton";
+import { ThemeToggle } from "@/components/shared/ThemeToggle";
 
 type AppHeaderProps = {
   onSignOut: () => Promise<void>;
@@ -28,7 +29,10 @@ export function AppHeader({ onSignOut }: AppHeaderProps) {
             </h1>
           </div>
         </div>
-        <SignOutButton onSignOut={onSignOut} className="px-3" />
+        <div className="flex shrink-0 items-center gap-1">
+          <ThemeToggle />
+          <SignOutButton onSignOut={onSignOut} className="px-3" />
+        </div>
       </div>
     </header>
   );

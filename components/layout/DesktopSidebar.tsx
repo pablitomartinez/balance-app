@@ -5,6 +5,7 @@ import Link from "next/link";
 import { CircleHelp } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { SignOutButton } from "@/components/shared/SignOutButton";
+import { ThemeToggle } from "@/components/shared/ThemeToggle";
 import {
   isNavigationItemActive,
   navigationItems,
@@ -67,6 +68,7 @@ export function DesktopSidebar({ onSignOut }: DesktopSidebarProps) {
       </nav>
 
       <div className="mt-auto space-y-1 border-t border-border pt-4">
+        <ThemeToggle variant="sidebar" />
         <Link
           href="/help"
           aria-current={pathname === "/help" ? "page" : undefined}

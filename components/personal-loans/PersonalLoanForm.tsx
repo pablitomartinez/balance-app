@@ -116,7 +116,7 @@ export function PersonalLoanForm({
         />
       </label>
 
-      {error && <p role="alert" className="rounded-md border border-destructive/20 bg-destructive/5 px-3 py-2 text-sm text-destructive">{error}</p>}
+      {error && <p role="alert" className="rounded-md border border-destructive-border bg-destructive-muted px-3 py-2 text-sm text-destructive">{error}</p>}
       {success && <p role="status" className="rounded-md border border-border bg-muted px-3 py-2 text-sm text-foreground">Préstamo registrado correctamente.</p>}
 
       <Button className="w-full" disabled={saving} type="submit">

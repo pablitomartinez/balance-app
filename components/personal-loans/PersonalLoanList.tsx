@@ -33,12 +33,12 @@ function statusLabel(status: PersonalLoanListItem["status"]) {
 
 function statusClassName(status: PersonalLoanListItem["status"]) {
   if (status === "paid") {
-    return "border-success/30 bg-success/10 text-success";
+    return "border-success-border bg-success-muted text-success";
   }
   if (status === "cancelled") {
     return "border-border bg-muted text-muted-foreground";
   }
-  return "border-warning/30 bg-warning/10 text-warning";
+  return "border-warning-border bg-warning-muted text-warning";
 }
 
 function PersonalLoanSkeleton() {

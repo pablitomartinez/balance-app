@@ -75,13 +75,13 @@ function getStatusLabel(status: ExpenseListItem["status"]) {
 function getStatusClassName(status: ExpenseListItem["status"]) {
   switch (status) {
     case "pending":
-      return "border-warning/30 bg-warning/10 text-warning";
+      return "border-warning-border bg-warning-muted text-warning";
 
     case "approved":
-      return "border-success/30 bg-success/10 text-success";
+      return "border-success-border bg-success-muted text-success";
 
     case "rejected":
-      return "border-destructive/30 bg-destructive/10 text-destructive";
+      return "border-destructive-border bg-destructive-muted text-destructive";
   }
 }
 
