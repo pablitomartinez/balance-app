@@ -6,7 +6,7 @@ type BalanceCardProps = {
   otherMemberName: string | null;
 };
 
-function getBalanceMessage(
+export function getBalanceMessage(
   direction: BalanceSummary["direction"],
   otherMemberName: string | null
 ) {

@@ -81,7 +81,7 @@ export default function CreateHomePage() {
 
           <input
             id="home-name"
-            className="mb-3 w-full rounded border border-input p-3 text-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-ring"
+            className="mb-3 w-full rounded border border-input bg-background p-3 text-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-ring"
             placeholder="Ej. Casa de Ana y Juan"
             value={name}
             onChange={(event) => {

@@ -1,12 +1,15 @@
 "use client";
 
+import type { ReactNode } from "react";
 import type { ExpenseListItem } from "@/hooks/useExpenses";
+import { EmptyState } from "@/components/ui/EmptyState";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { formatCurrency } from "@/lib/utils";
 
 type ExpenseListProps = {
   expenses: ExpenseListItem[];
   loading?: boolean;
+  emptyAction?: ReactNode;
 };
 
 const PAYMENT_METHOD_LABELS: Record<
@@ -72,31 +75,32 @@ function getStatusLabel(status: ExpenseListItem["status"]) {
 function getStatusClassName(status: ExpenseListItem["status"]) {
   switch (status) {
     case "pending":
-      return "border-warning/30 bg-warning/10 text-warning";
+      return "border-warning-border bg-warning-muted text-warning";
 
     case "approved":
-      return "border-success/30 bg-success/10 text-success";
+      return "border-success-border bg-success-muted text-success";
 
     case "rejected":
-      return "border-destructive/30 bg-destructive/10 text-destructive";
+      return "border-destructive-border bg-destructive-muted text-destructive";
   }
 }
 
 function ExpenseSkeleton() {
   return (
-    <article className="rounded-md border border-border bg-card p-4">
+    <article className="rounded-md border border-border bg-card p-4 lg:grid lg:grid-cols-[minmax(0,1fr)_7rem_8rem_8rem] lg:items-center lg:gap-4 lg:rounded-none lg:border-x-0 lg:border-t-0">
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0 flex-1 space-y-2">
           <Skeleton className="h-4 w-2/3" />
           <Skeleton className="h-3 w-1/2" />
         </div>
 
-        <Skeleton className="h-5 w-20 shrink-0" />
+        <Skeleton className="h-5 w-20 shrink-0 lg:hidden" />
       </div>
 
-      <div className="mt-3 flex items-center justify-between gap-3">
+      <div className="mt-3 flex items-center justify-between gap-3 lg:mt-0 lg:contents">
         <Skeleton className="h-3 w-12" />
         <Skeleton className="h-6 w-20 rounded-full" />
+        <Skeleton className="hidden h-5 w-20 justify-self-end lg:block" />
       </div>
     </article>
   );
@@ -105,10 +109,11 @@ function ExpenseSkeleton() {
 export function ExpenseList({
   expenses,
   loading = false,
+  emptyAction,
 }: ExpenseListProps) {
   if (loading) {
     return (
-      <div className="space-y-3">
+      <div className="space-y-3 lg:overflow-hidden lg:rounded-lg lg:border lg:border-border lg:bg-card lg:space-y-0">
         <ExpenseSkeleton />
         <ExpenseSkeleton />
         <ExpenseSkeleton />
@@ -118,15 +123,11 @@ export function ExpenseList({
 
   if (expenses.length === 0) {
     return (
-      <div className="rounded-md border border-border bg-card p-6 text-center">
-        <p className="text-sm font-semibold text-foreground">
-          Todavía no hay gastos
-        </p>
-
-        <p className="mt-1 text-sm text-muted-foreground">
-          Los gastos que registres aparecerán acá.
-        </p>
-      </div>
+      <EmptyState
+        title="Todavía no hay gastos"
+        description="Los gastos que registres aparecerán acá."
+        action={emptyAction}
+      />
     );
   }
 
@@ -150,7 +151,7 @@ export function ExpenseList({
     return (
       <article
         key={expense.id}
-        className="rounded-md border border-border bg-card p-4"
+        className="rounded-md border border-border bg-card p-4 transition lg:grid lg:grid-cols-[minmax(0,1fr)_7rem_8rem_8rem] lg:items-center lg:gap-4 lg:rounded-none lg:border-x-0 lg:border-t-0 lg:hover:bg-muted/40 lg:last:border-b-0"
       >
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0">
@@ -164,12 +165,12 @@ export function ExpenseList({
             </p>
           </div>
 
-          <p className="shrink-0 text-sm font-bold text-foreground">
+          <p className="shrink-0 text-sm font-bold text-foreground lg:hidden">
             {formatCurrency(expense.amount)}
           </p>
         </div>
 
-        <div className="mt-3 flex items-center justify-between gap-3">
+        <div className="mt-3 flex items-center justify-between gap-3 lg:mt-0 lg:contents">
           <span className="text-xs text-muted-foreground">
             {isToday(expense.expenseDate)
               ? "Hoy"
@@ -177,26 +178,30 @@ export function ExpenseList({
           </span>
 
           <span
-            className={`rounded-full border px-2.5 py-1 text-xs font-semibold ${getStatusClassName(
+            className={`w-fit rounded-full border px-2.5 py-1 text-xs font-semibold ${getStatusClassName(
               expense.status
             )}`}
           >
             {getStatusLabel(expense.status)}
           </span>
+
+          <p className="hidden justify-self-end whitespace-nowrap text-sm font-bold text-foreground lg:block">
+            {formatCurrency(expense.amount)}
+          </p>
         </div>
       </article>
     );
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 lg:space-y-5">
       {todayExpenses.length > 0 && (
         <section>
           <h2 className="mb-3 text-sm font-bold text-foreground">
             Hoy
           </h2>
 
-          <div className="space-y-2">
+          <div className="space-y-2 lg:overflow-hidden lg:rounded-lg lg:border lg:border-border lg:bg-card lg:space-y-0">
             {todayExpenses.map(renderExpense)}
           </div>
         </section>
@@ -208,7 +213,7 @@ export function ExpenseList({
             Esta semana
           </h2>
 
-          <div className="space-y-2">
+          <div className="space-y-2 lg:overflow-hidden lg:rounded-lg lg:border lg:border-border lg:bg-card lg:space-y-0">
             {weekExpenses.map(renderExpense)}
           </div>
         </section>
@@ -220,7 +225,7 @@ export function ExpenseList({
             Anteriores
           </h2>
 
-          <div className="space-y-2">
+          <div className="space-y-2 lg:overflow-hidden lg:rounded-lg lg:border lg:border-border lg:bg-card lg:space-y-0">
             {olderExpenses.map(renderExpense)}
           </div>
         </section>

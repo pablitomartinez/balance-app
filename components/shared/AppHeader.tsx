@@ -1,22 +1,15 @@
-"use client";
-
 import Image from "next/image";
-import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/Button";
-import { useAuth } from "@/hooks/useAuth";
+import { SignOutButton } from "@/components/shared/SignOutButton";
+import { ThemeToggle } from "@/components/shared/ThemeToggle";
 
-// Encabezado principal con la acción de salida centralizada en el hook de auth.
-export function AppHeader() {
-  const router = useRouter();
-  const { signOut } = useAuth();
+type AppHeaderProps = {
+  onSignOut: () => Promise<void>;
+};
 
-  async function handleSignOut() {
-    await signOut();
-    router.replace("/login");
-  }
-
+// Encabezado principal para mobile y tablet.
+export function AppHeader({ onSignOut }: AppHeaderProps) {
   return (
-    <header className="sticky top-0 z-10 border-b border-border bg-background backdrop-blur">
+    <header className="sticky top-0 z-10 border-b border-border bg-background backdrop-blur lg:hidden">
       <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-4 py-3">
         <div className="flex min-w-0 items-center gap-2.5">
           <Image
@@ -36,9 +29,10 @@ export function AppHeader() {
             </h1>
           </div>
         </div>
-        <Button variant="ghost" className="px-3" onClick={handleSignOut}>
-          Salir
-        </Button>
+        <div className="flex shrink-0 items-center gap-1">
+          <ThemeToggle />
+          <SignOutButton onSignOut={onSignOut} className="px-3" />
+        </div>
       </div>
     </header>
   );

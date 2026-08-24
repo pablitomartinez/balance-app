@@ -1,6 +1,7 @@
 import type { Config } from "tailwindcss";
 
 const config: Config = {
+  darkMode: "class",
   content: [
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
@@ -44,6 +45,8 @@ const config: Config = {
         "success-border": "var(--success-border)",
 
         warning: "var(--warning)",
+        "warning-muted": "var(--warning-muted)",
+        "warning-border": "var(--warning-border)",
 
         destructive: "var(--destructive)",
         "destructive-foreground": "var(--destructive-foreground)",

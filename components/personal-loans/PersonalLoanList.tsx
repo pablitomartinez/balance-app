@@ -1,5 +1,6 @@
 "use client";
 
+import type { ReactNode } from "react";
 import { useState } from "react";
 import { PersonalLoanPaymentForm } from "@/components/personal-loans/PersonalLoanPaymentForm";
 import { Button } from "@/components/ui/Button";
@@ -13,10 +14,15 @@ type PersonalLoanListProps = {
   currentUserId: string;
   loading?: boolean;
   onPaymentRecorded: () => void;
+  emptyAction?: ReactNode;
 };
 
 function formatDate(date: string) {
-  return new Intl.DateTimeFormat("es-AR", { day: "numeric", month: "short", year: "numeric" }).format(new Date(`${date}T12:00:00`));
+  return new Intl.DateTimeFormat("es-AR", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  }).format(new Date(`${date}T12:00:00`));
 }
 
 function statusLabel(status: PersonalLoanListItem["status"]) {
@@ -25,37 +31,146 @@ function statusLabel(status: PersonalLoanListItem["status"]) {
   return "Pendiente";
 }
 
-export function PersonalLoanList({ loans, currentUserId, loading = false, onPaymentRecorded }: PersonalLoanListProps) {
+function statusClassName(status: PersonalLoanListItem["status"]) {
+  if (status === "paid") {
+    return "border-success-border bg-success-muted text-success";
+  }
+  if (status === "cancelled") {
+    return "border-border bg-muted text-muted-foreground";
+  }
+  return "border-warning-border bg-warning-muted text-warning";
+}
+
+function PersonalLoanSkeleton() {
+  return (
+    <article className="rounded-md border border-border bg-card p-4 lg:rounded-none lg:border-x-0 lg:border-t-0">
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-[minmax(0,1.4fr)_7.5rem_8rem_8rem_8.5rem] lg:items-center lg:gap-4">
+        <div className="col-span-2 space-y-2 lg:col-span-1">
+          <Skeleton className="h-4 w-2/3" />
+          <Skeleton className="h-3 w-1/2" />
+        </div>
+        <div className="col-span-2 flex items-center justify-between gap-3 lg:col-span-1 lg:block">
+          <Skeleton className="h-3 w-16" />
+          <Skeleton className="h-6 w-20 rounded-full lg:mt-2" />
+        </div>
+        <Skeleton className="h-8 w-full" />
+        <Skeleton className="h-8 w-full" />
+        <Skeleton className="col-span-2 h-10 w-full lg:col-span-1" />
+      </div>
+    </article>
+  );
+}
+
+export function PersonalLoanList({
+  loans,
+  currentUserId,
+  loading = false,
+  onPaymentRecorded,
+  emptyAction,
+}: PersonalLoanListProps) {
   const [payingLoanId, setPayingLoanId] = useState<string | null>(null);
 
   if (loading) {
-    return <div className="space-y-3"><Skeleton className="h-36 w-full" /><Skeleton className="h-36 w-full" /></div>;
+    return (
+      <div className="space-y-3 lg:overflow-hidden lg:rounded-lg lg:border lg:border-border lg:bg-card lg:space-y-0">
+        <PersonalLoanSkeleton />
+        <PersonalLoanSkeleton />
+      </div>
+    );
   }
 
   if (loans.length === 0) {
-    return <EmptyState title="Sin préstamos personales" description="Los préstamos que registren aparecerán acá." />;
+    return (
+      <EmptyState
+        title="Sin préstamos personales"
+        description="Los préstamos que registren aparecerán acá."
+        action={emptyAction}
+      />
+    );
   }
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-3 lg:overflow-hidden lg:rounded-lg lg:border lg:border-border lg:bg-card lg:space-y-0">
       {loans.map((loan) => {
-        const canPay = loan.status === "open" && loan.borrowerId === currentUserId && loan.remainingAmount > 0;
+        const canPay =
+          loan.status === "open" &&
+          loan.borrowerId === currentUserId &&
+          loan.remainingAmount > 0;
+
         return (
-          <article key={loan.id} className="rounded-md border border-border bg-card p-4">
-            <div className="flex items-start justify-between gap-4">
-              <div className="min-w-0">
-                <h3 className="truncate text-sm font-semibold text-foreground">{loan.description}</h3>
-                <p className="mt-1 text-xs text-muted-foreground">{loan.lenderName} le prestó a {loan.borrowerName} · {formatDate(loan.loanDate)}</p>
+          <article
+            key={loan.id}
+            className="rounded-md border border-border bg-card p-4 transition lg:rounded-none lg:border-x-0 lg:border-t-0 lg:hover:bg-muted/40 lg:last:border-b-0"
+          >
+            <div className="grid grid-cols-2 gap-3 lg:grid-cols-[minmax(0,1.4fr)_7.5rem_8rem_8rem_8.5rem] lg:items-center lg:gap-4">
+              <div className="col-span-2 flex min-w-0 flex-col lg:col-span-1">
+                <h3 className="order-1 truncate text-sm font-semibold text-foreground lg:order-2 lg:mt-1 lg:text-xs lg:font-normal lg:text-muted-foreground">
+                  {loan.description}
+                </h3>
+                <p className="order-2 mt-1 break-words text-xs text-muted-foreground lg:order-1 lg:mt-0 lg:text-sm lg:font-semibold lg:text-foreground">
+                  {loan.lenderName} → {loan.borrowerName}
+                </p>
               </div>
-              <span className="shrink-0 rounded-full border border-border bg-muted px-2.5 py-1 text-xs font-semibold text-muted-foreground">{statusLabel(loan.status)}</span>
+
+              <div className="col-span-2 flex items-center justify-between gap-3 lg:col-span-1 lg:block">
+                <p className="text-xs text-muted-foreground">
+                  {formatDate(loan.loanDate)}
+                </p>
+                <span
+                  className={`w-fit shrink-0 rounded-full border px-2.5 py-1 text-xs font-semibold lg:mt-2 lg:inline-block ${statusClassName(
+                    loan.status
+                  )}`}
+                >
+                  {statusLabel(loan.status)}
+                </span>
+              </div>
+
+              <div>
+                <p className="text-xs text-muted-foreground">Monto original</p>
+                <p className="mt-1 whitespace-nowrap text-sm font-bold text-foreground">
+                  {formatCurrency(loan.principalAmount)}
+                </p>
+              </div>
+
+              <div>
+                <p className="text-xs text-muted-foreground">Saldo pendiente</p>
+                <p className="mt-1 whitespace-nowrap text-sm font-bold text-foreground">
+                  {formatCurrency(loan.remainingAmount)}
+                </p>
+                {loan.totalPaid > 0 && (
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Pagado: {formatCurrency(loan.totalPaid)}
+                  </p>
+                )}
+              </div>
+
+              <div className="col-span-2 lg:col-span-1">
+                {canPay && payingLoanId !== loan.id && (
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    className="w-full"
+                    onClick={() => setPayingLoanId(loan.id)}
+                  >
+                    Registrar pago
+                  </Button>
+                )}
+              </div>
             </div>
-            <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
-              <div><p className="text-xs text-muted-foreground">Monto original</p><p className="mt-1 font-bold text-foreground">{formatCurrency(loan.principalAmount)}</p></div>
-              <div><p className="text-xs text-muted-foreground">Saldo pendiente</p><p className="mt-1 font-bold text-foreground">{formatCurrency(loan.remainingAmount)}</p></div>
-            </div>
-            {loan.totalPaid > 0 && <p className="mt-3 text-xs text-muted-foreground">Pagado: {formatCurrency(loan.totalPaid)}</p>}
-            {canPay && payingLoanId !== loan.id && <Button type="button" variant="secondary" className="mt-4 w-full" onClick={() => setPayingLoanId(loan.id)}>Registrar pago</Button>}
-            {payingLoanId === loan.id && <PersonalLoanPaymentForm loanId={loan.id} remainingAmount={loan.remainingAmount} onCancel={() => setPayingLoanId(null)} onRecorded={() => { setPayingLoanId(null); onPaymentRecorded(); }} />}
+
+            {payingLoanId === loan.id && (
+              <div className="lg:ml-auto lg:max-w-xl">
+                <PersonalLoanPaymentForm
+                  loanId={loan.id}
+                  remainingAmount={loan.remainingAmount}
+                  onCancel={() => setPayingLoanId(null)}
+                  onRecorded={() => {
+                    setPayingLoanId(null);
+                    onPaymentRecorded();
+                  }}
+                />
+              </div>
+            )}
           </article>
         );
       })}

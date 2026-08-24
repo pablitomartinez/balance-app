@@ -8,7 +8,7 @@ type PersonalDebtCardProps = {
   otherMemberName: string | null;
 };
 
-function message(direction: PersonalDebtDirection, otherMemberName: string | null) {
+export function getPersonalDebtMessage(direction: PersonalDebtDirection, otherMemberName: string | null) {
   const other = otherMemberName ?? "la otra persona";
   if (direction === "current_user_owes") return `Le debés a ${other}`;
   if (direction === "other_user_owes") return `${other} te debe`;
@@ -19,7 +19,7 @@ export function PersonalDebtCard({ amount, direction, otherMemberName }: Persona
   return (
     <section className="rounded-lg border border-brand-border bg-card p-5 shadow-soft">
       <p className="text-sm font-semibold text-muted-foreground">Deuda personal</p>
-      <p className="mt-2 text-lg font-bold text-foreground">{message(direction, otherMemberName)}</p>
+      <p className="mt-2 text-lg font-bold text-foreground">{getPersonalDebtMessage(direction, otherMemberName)}</p>
       <p className="mt-2 text-3xl font-black text-foreground">{formatCurrency(amount)}</p>
       <Link href="/personal-loans" className="mt-4 inline-block rounded-sm text-sm font-semibold text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">Ver préstamos</Link>
     </section>
