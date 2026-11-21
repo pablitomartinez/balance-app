@@ -1,10 +1,11 @@
 import Link from "next/link";
-import { CheckCheck, HandCoins, Plus, ReceiptText } from "lucide-react";
+import { CheckCheck, HandCoins, Plus, ReceiptText, ShoppingBasket } from "lucide-react";
 
 const actions = [
   { href: "/expenses", label: "Registrar gasto", icon: ReceiptText },
   { href: "/personal-loans", label: "Registrar préstamo personal", icon: HandCoins },
   { href: "/approvals", label: "Revisar aprobaciones", icon: CheckCheck },
+  { href: "/shopping-list", label: "Lista del súper", icon: ShoppingBasket },
 ];
 
 export function QuickActions() {
