@@ -1,5 +1,15 @@
 import { supabase } from "@/lib/supabaseClient";
 
+export async function clearShoppingList() {
+  const { data, error } = await supabase.rpc("clear_shopping_list");
+
+  if (error) {
+    throw new Error("No se pudo vaciar la lista. Intentá de nuevo.");
+  }
+
+  return data;
+}
+
 export async function addShoppingItem(name: string) {
   const { data, error } = await supabase.rpc("add_shopping_item", {
     p_name: name.trim(),
