@@ -14,14 +14,15 @@ export function AuthGuard({ children }: AuthGuardProps) {
   const router = useRouter();
   const pathname = usePathname();
   const { user, loading } = useAuth();
+  const userId = user?.id;
   const [hasHome, setHasHome] = useState<boolean | null>(null);
   const [homeLoading, setHomeLoading] = useState(true);
 
   useEffect(() => {
-    if (!loading && !user) {
+    if (!loading && !userId) {
       router.replace("/login");
     }
-  }, [loading, router, user]);
+  }, [loading, router, userId]);
 
   useEffect(() => {
     let active = true;
@@ -29,7 +30,7 @@ export function AuthGuard({ children }: AuthGuardProps) {
     async function checkHome() {
       if (loading) return;
 
-      if (!user) {
+      if (!userId) {
         setHasHome(null);
         setHomeLoading(false);
         return;
@@ -40,7 +41,7 @@ export function AuthGuard({ children }: AuthGuardProps) {
       const { data, error } = await supabase
         .from("home_members")
         .select("home_id")
-        .eq("profile_id", user.id)
+        .eq("profile_id", userId)
         .maybeSingle();
 
       if (!active) return;
@@ -55,10 +56,10 @@ export function AuthGuard({ children }: AuthGuardProps) {
     return () => {
       active = false;
     };
-  }, [loading, user]);
+  }, [loading, userId]);
 
   useEffect(() => {
-    if (loading || homeLoading || !user || hasHome === null) return;
+    if (loading || homeLoading || !userId || hasHome === null) return;
 
     if (!hasHome && pathname !== "/home-entry") {
       router.replace("/home-entry");
@@ -68,14 +69,14 @@ export function AuthGuard({ children }: AuthGuardProps) {
     if (hasHome && pathname === "/home-entry") {
       router.replace("/dashboard");
     }
-  }, [hasHome, homeLoading, loading, pathname, router, user]);
+  }, [hasHome, homeLoading, loading, pathname, router, userId]);
 
   const redirecting =
     hasHome !== null &&
     ((!hasHome && pathname !== "/home-entry") ||
       (hasHome && pathname === "/home-entry"));
 
-  if (loading || homeLoading || !user || redirecting) {
+  if (loading || homeLoading || !userId || redirecting) {
     return (
       <main className="flex min-h-screen items-center justify-center px-4">
         <div className="h-10 w-10 rounded-full border-4 border-muted border-t-primary" />
