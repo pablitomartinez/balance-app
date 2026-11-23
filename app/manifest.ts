@@ -5,7 +5,7 @@ export default function manifest(): MetadataRoute.Manifest {
     name: "Balance Hogar",
     short_name: "Balance",
     description: "Balance compartido para gastos del hogar",
-    start_url: "/",
+    start_url: "/dashboard",
     display: "standalone",
     background_color: "#FAF8F5",
     theme_color: "#76558F",
