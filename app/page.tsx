@@ -1,6 +1,11 @@
-import { redirect } from "next/navigation";
+import type { Metadata } from "next";
+import { PublicLanding } from "@/components/marketing/PublicLanding";
 
-// Esta página inicial lleva al usuario al dashboard, donde se valida su sesión.
+export const metadata: Metadata = {
+  title: "Balance — Gastos compartidos con claridad",
+  description: "Organizá los gastos de tu hogar, sepan quién pagó y mantengan sus cuentas compartidas claras en un solo lugar.",
+};
+
 export default function HomePage() {
-  redirect("/dashboard");
+  return <PublicLanding />;
 }
